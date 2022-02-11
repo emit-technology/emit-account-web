@@ -1,0 +1,7 @@
+{
+  "name": "emit-core-account",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
