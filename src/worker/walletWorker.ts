@@ -16,9 +16,10 @@
  along with E.M.I.T. . If not, see <http://www.gnu.org/licenses/>.
  */
 
-import service from 'walletService/src/index';
-import {AccountModel, ChainType} from "../types";
+import service from 'walletService';
+import {AccountModel, ChainType} from "emit-types";
 import selfStorage from "../common/storage";
+import url from "../common/url";
 
 class WalletWorker {
 
@@ -114,13 +115,15 @@ class WalletWorker {
         })
     }
 
-    async accounts(){
+    async accounts():Promise<Array<AccountModel>> {
         return new Promise((resolve, reject)=>{
             service.accounts(function (data:any){
                 if(data.error){
                     reject(data.error);
                 }else{
-                    resolve(data.result);
+                    const tmp: Array<AccountModel> = data.result;
+                    console.log(tmp)
+                    resolve(tmp);
                 }
             })
         })
@@ -150,10 +153,7 @@ class WalletWorker {
         return new Promise((resolve, reject)=>{
             if(accountId) {
                 const data:any = selfStorage.getItem(accountId);
-                if(data){
-                    if(!data.addresses[ChainType.BSC]){
-                        data.addresses[ChainType.BSC] = data.addresses[ChainType.ETH]
-                    }
+                if(data && data.addresses){
                     if(selfStorage.getItem("sero_address")){
                         data.addresses[ChainType.SERO]=selfStorage.getItem("sero_address")
                     }
@@ -166,18 +166,28 @@ class WalletWorker {
                     if(selfStorage.getItem("tron_address")){
                         data.addresses[ChainType.TRON]=selfStorage.getItem("tron_address")
                     }
-
-                    resolve(data);
+                    resolve(data)
+                }else{
+                    service.accountInfo(accountId,function (data:any){
+                        if(data.error){
+                            console.log(data.error);
+                            reject(data.error)
+                        }else{
+                            const tmp:any = data.result;
+                            resolve(tmp)
+                            selfStorage.setItem(accountId,tmp)
+                        }
+                    })
                 }
-
                 service.accountInfo(accountId,function (data:any){
                     if(data.error){
-                        reject(data.error);
+                        console.log(data.error);
+                        if(data.error.indexOf("unlock") > -1){
+                            url.accountUnlock();
+                        }
                     }else{
                         const tmp:any = data.result;
-                        tmp.addresses[ChainType.BSC] = tmp.addresses[ChainType.ETH]
                         selfStorage.setItem(accountId,tmp)
-                        resolve(tmp);
                     }
                 })
             }else{
@@ -192,7 +202,7 @@ class WalletWorker {
         })
     }
 
-    async signTx(accountId:string,password:string,chainType:any,params:any,chainParams?:any){
+    async signTx(accountId:string,password:string,chainType:any,params:any,chainParams?:any) :Promise<any> {
         return new Promise((resolve, reject)=>{
             service.signTx(accountId,password,chainType,params,chainParams, function (data:any){
                 if(data.error){
@@ -217,9 +227,9 @@ class WalletWorker {
     }
 
     async unlockWallet(password:string){
-        const account:any = await this.accountInfo()
+        const accountId = selfStorage.getItem("accountId");;
         return new Promise((resolve, reject) =>{
-            service.unlockWallet(account.accountId,password,function (data:any){
+            service.unlockWallet(accountId,password,function (data:any){
                 if(data.error){
                     reject(data.error);
                 }else{
@@ -253,6 +263,17 @@ class WalletWorker {
         })
     }
 
+    async personSignMsg(chainType:ChainType,msg:any):Promise<string> {
+        return new Promise((resolve, reject) => {
+            service.personSignMessage(chainType,msg,function (data:any){
+                if(data.error){
+                    reject(data.error);
+                }else{
+                    resolve(data.result);
+                }
+            })
+        })
+    }
 
 }
 

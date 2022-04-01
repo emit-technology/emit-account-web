@@ -16,9 +16,6 @@
  along with E.M.I.T. . If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ChainType} from "../types";
-import walletWorker from "../worker/walletWorker";
-
 class Url {
     private base = "#"
 
@@ -87,8 +84,8 @@ class Url {
      * @param delay seconds
      */
     goTo(path: string, pre: string, delay?: number) {
-        const data: any = sessionStorage.getItem("history");
         if (pre) {
+            const data: any = sessionStorage.getItem("history");
             const pathArr = data && JSON.parse(data);
             if (pathArr && pathArr.length > 0) {
                 pathArr.push(pre);
@@ -100,12 +97,10 @@ class Url {
         if (delay) {
             setTimeout(() => {
                 window.location.href = path
-                // window.location.reload();
             })
             return
         }
         window.location.href = path
-        // window.location.reload();
         return;
     }
 
@@ -149,11 +144,11 @@ class Url {
     }
 
     accountUnlock() {
-        if (process.env.NODE_ENV == "development"){
-            walletWorker.unlockWallet("12345678")
-        }else{
+        // if (process.env.NODE_ENV == "development"){
+        //     walletWorker.unlockWallet("12345678")
+        // }else{
             this.goTo([this.base, this.account.unlock].join("/"), "");
-        }
+        // }
     }
 }
 

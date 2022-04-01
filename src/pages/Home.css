@@ -1,0 +1,22 @@
+.common-modal{
+    --height: 60vh;
+    --width: 90vw;
+    --max-width: 512px;
+    --border-radius: 25px;
+}
+
+.accounts-popover{
+    --height: 90vh;
+    --width: 80vw;
+    --max-width: 300px;
+    --background: #000;
+}
+
+.account-list{
+    height: auto;
+    max-height: 400px;
+    overflow-y: scroll;
+    border-bottom: 1px solid #dddddd;
+    border-top: 1px solid #ddd;
+    margin-top: 12px;
+}

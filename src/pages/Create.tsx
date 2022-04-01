@@ -30,11 +30,12 @@ import {
 } from "@ionic/react";
 import './style.css';
 import walletWorker from "../worker/walletWorker";
-import {AccountModel} from "../types";
+import {AccountModel} from "emit-types";
 import url from "../common/url";
 import i18n from "../locales/i18n";
 import selfStorage from "../common/storage";
 import {chevronBack} from "ionicons/icons";
+import {config} from "../common/config";
 
 interface State {
     name: string;
@@ -92,7 +93,11 @@ class CreateAccount extends React.Component<any, State> {
         const tmp:AccountModel = {name:name,password:password,hint:tips}
         sessionStorage.setItem("tmpAccount",JSON.stringify(tmp))
         walletWorker.generateMnemonic().then((rest:any)=>{
-            sessionStorage.setItem("tmpMnemonic",rest)
+            // sessionStorage.setItem("tmpMnemonic",rest)
+            config.TMP.MNEMONIC = rest;
+            this.setState({
+                showProgress:false
+            })
             setTimeout(()=>{
                 // window.location.href = "/#/account/backup";
                 url.accountBackup();

@@ -33,6 +33,7 @@ import walletWorker from "../worker/walletWorker";
 import selfStorage from "../common/storage";
 import url from "../common/url";
 import i18n from '../locales/i18n'
+import {config} from "../common/config";
 
 interface State {
     mnemonic:string
@@ -95,6 +96,7 @@ class ImportAccount extends React.Component<any, State> {
             walletWorker.importMnemonic(mnemonic, name, password, tips, "").then(((accountId:any) => {
                 if(accountId){
                     sessionStorage.removeItem("tmpMnemonic");
+                    config.TMP.MNEMONIC = "";
                     sessionStorage.removeItem("tmpAccount");
                     selfStorage.setItem("accountId",accountId)
                     // window.location.href = "/#/"
@@ -114,6 +116,7 @@ class ImportAccount extends React.Component<any, State> {
             walletWorker.importPrivateKey(mnemonic, name, password, tips, "").then(((accountId:any) => {
                 if(accountId){
                     sessionStorage.removeItem("tmpMnemonic");
+                    config.TMP.MNEMONIC = "";
                     sessionStorage.removeItem("tmpAccount");
                     selfStorage.setItem("accountId",accountId)
                     // window.location.href = "/#/"

@@ -1,13 +1,96 @@
+import * as React from 'react';
+
 import './ExploreContainer.css';
+import {
+  IonItem,
+  IonAvatar,
+  IonLabel,
+  IonList,
+  IonText,
+  IonIcon, IonPopover, IonListHeader
+} from '@ionic/react'
+import {AccountModel, ChainType} from "emit-types";
+import {ellipseSharp, ellipsisVertical, openOutline, qrCode, qrCodeSharp, radioButtonOnOutline} from "ionicons/icons";
+import {config} from "../common/config";
+import {utils} from "../common/utils";
 
-interface ContainerProps { }
+interface ContainerProps {
+  account?:AccountModel
+  showAccountDetail?:(chainId:ChainType)=>void;
+  showAccessedWebsite?:(chainId:ChainType)=>void;
+  viewAccountInExplorer?:(chainId:ChainType)=>void;
+}
 
-const ExploreContainer: React.FC<ContainerProps> = () => {
+const ExploreContainer: React.FC<ContainerProps> = ({account,showAccessedWebsite,showAccountDetail,viewAccountInExplorer}) => {
   return (
-    <div className="container">
-      <strong>Ready to create an app?</strong>
-      <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-    </div>
+    <>
+      <IonList>
+        <IonListHeader color="light" mode="ios">
+          <IonLabel><IonText color="medium">Hello, </IonText>{account.name} </IonLabel>
+        </IonListHeader>
+        {
+            account && account.addresses && Object.keys(account.addresses).map((v,i) => {
+              const chainId = parseInt(v)
+                return <IonItem key={i} onClick={(e)=>{
+                  e.persist()
+                  showAccountDetail(chainId)
+                }}>
+                  <IonAvatar slot="start">
+                    <img src={`./assets/img/logo/${ChainType[chainId]}.png`}/>
+                  </IonAvatar>
+                    <IonLabel className="ion-text-wrap">
+                     <div>
+                       <h1><IonText color={"dark"}>{config.CHAIN_DESCRIPTION[ChainType[chainId]]}</IonText></h1>
+                       <IonText color="medium">{utils.ellipsisStr(account.addresses[v],10)}</IonText>
+                     </div>
+                    </IonLabel>
+                  {
+                    showAccessedWebsite && showAccessedWebsite && viewAccountInExplorer &&
+                    <IonIcon slot="end" icon={qrCode} id={`acct-detail-${chainId}`} color="medium"/>
+                  }
+                  {/*<>*/}
+                  {/*  <IonPopover trigger={`acct-detail-${chainId}`} dismissOnSelect>*/}
+                  {/*    {*/}
+                  {/*      viewAccountInExplorer && <IonItem onClick={(e)=>{*/}
+                  {/*        e.persist()*/}
+                  {/*        viewAccountInExplorer(chainId)*/}
+                  {/*      }}>*/}
+                  {/*        <IonIcon icon={openOutline} size="small" slot="start"/>*/}
+                  {/*        <IonLabel className="ion-text-wrap">*/}
+                  {/*          <IonText>View Account</IonText>*/}
+                  {/*          <p><IonText color="medium"><small>{config.VIEW_WEBSITE[ChainType[chainId]]}</small></IonText></p>*/}
+                  {/*        </IonLabel>*/}
+                  {/*      </IonItem>*/}
+                  {/*    }*/}
+                  {/*    {*/}
+                  {/*      showAccountDetail && <IonItem onClick={(e)=>{*/}
+                  {/*        e.persist()*/}
+                  {/*        showAccountDetail(chainId)*/}
+                  {/*      }}>*/}
+                  {/*        <IonIcon icon={qrCode} size="small" slot="start"/>*/}
+                  {/*        <IonLabel className="ion-text-wrap">*/}
+                  {/*          <IonText>Account Detail</IonText>*/}
+                  {/*        </IonLabel>*/}
+                  {/*      </IonItem>*/}
+                  {/*    }*/}
+                  {/*    {*/}
+                  {/*      showAccessedWebsite && <IonItem lines="none" onClick={(e)=>{*/}
+                  {/*        e.persist()*/}
+                  {/*        showAccessedWebsite(chainId)*/}
+                  {/*      }}>*/}
+                  {/*        <IonIcon icon={radioButtonOnOutline} size="small" slot="start"/>*/}
+                  {/*        <IonLabel className="ion-text-wrap">*/}
+                  {/*          <IonText>Accessed Website</IonText>*/}
+                  {/*        </IonLabel>*/}
+                  {/*      </IonItem>*/}
+                  {/*    }*/}
+                  {/*  </IonPopover>*/}
+                  {/*</>*/}
+                </IonItem>
+            })
+        }
+      </IonList>
+    </>
   );
 };
 

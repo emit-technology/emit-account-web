@@ -30,6 +30,7 @@ import './style.css';
 import url from "../common/url";
 import {chevronBack} from "ionicons/icons";
 import i18n from "../locales/i18n"
+import {config} from "../common/config";
 
 interface State {
     mnemonic: Array<string>;
@@ -42,7 +43,7 @@ class Backup extends React.Component<any, State> {
     }
 
     componentDidMount() {
-        const tmpMnemonic:any = sessionStorage.getItem("tmpMnemonic")
+        const tmpMnemonic:any = config.TMP.MNEMONIC;
         if(!tmpMnemonic){
             // window.location.href = "/#/account/create";
             url.accountCreate();

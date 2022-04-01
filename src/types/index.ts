@@ -13,5 +13,6 @@ export enum ChainType {
     SERO,
     ETH,
     TRON,
-    BSC
+    BSC,
+    EMIT
 }

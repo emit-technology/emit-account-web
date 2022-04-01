@@ -1,5 +1,6 @@
+import * as React from 'react';
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, setupIonicReact,IonRow,IonCol } from '@ionic/react';
 import { IonReactHashRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Backup from "./pages/Backup";
@@ -26,28 +27,37 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import {Widget} from "./pages/widget";
 
 setupIonicReact({
   mode:"ios"
 });
 
 const App: React.FC = () => (
-  <IonApp>
-    <IonReactHashRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home" component={Home}/>
-        <Route path="/account/create" component={CreateAccount} exact={true}/>
-        <Route path="/account/backup" component={Backup} exact={true}/>
-        <Route path="/account/confirm" component={Confirm} exact={true}/>
-        <Route path="/account/import" component={ImportAccount} exact={true}/>
-        <Route path="/account/unlock" component={Unlock} exact={true}/>
+    <div>
+      <IonApp>
+        <IonReactHashRouter>
+          {/*<IonSplitPane contentId="main">*/}
+          {/*<AccountMenu/>*/}
+          <IonRouterOutlet id="main">
+            <Route exact path="/home" component={Home}/>
+            <Route path="/account/create" component={CreateAccount} exact={true}/>
+            <Route path="/account/backup" component={Backup} exact={true}/>
+            <Route path="/account/confirm" component={Confirm} exact={true}/>
+            <Route path="/account/import" component={ImportAccount} exact={true}/>
+            <Route path="/account/unlock" component={Unlock} exact={true}/>
 
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactHashRouter>
-  </IonApp>
+            <Route path="/widget" component={Widget} exact={true}/>
+
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+          </IonRouterOutlet>
+          {/*</IonSplitPane>*/}
+
+        </IonReactHashRouter>
+      </IonApp>
+    </div>
 );
 
 export default App;

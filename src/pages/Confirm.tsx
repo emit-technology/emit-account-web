@@ -31,10 +31,11 @@ import {
 import './style.css';
 import {chevronBack, closeCircle} from 'ionicons/icons'
 import walletWorker from "../worker/walletWorker";
-import {AccountModel} from "../types";
+import {AccountModel} from "emit-types";
 import selfStorage from "../common/storage";
 import url from "../common/url";
 import i18n from "../locales/i18n";
+import {config} from "../common/config";
 
 interface State {
     origin: Array<string>
@@ -63,7 +64,7 @@ class Confirm extends React.Component<any, State> {
     }
 
     componentDidMount() {
-        const tmpMnemonic: any = sessionStorage.getItem("tmpMnemonic")
+        const tmpMnemonic: any =  config.TMP.MNEMONIC;// sessionStorage.getItem("tmpMnemonic")
         if (!tmpMnemonic) {
             // window.location.href = "/#/account/create";
             url.accountCreate();
@@ -76,7 +77,7 @@ class Confirm extends React.Component<any, State> {
     }
 
     confirm = () => {
-        const tmpMnemonic: any = sessionStorage.getItem("tmpMnemonic")
+        const tmpMnemonic: any =  config.TMP.MNEMONIC; //sessionStorage.getItem("tmpMnemonic")
         const tmpAccount: any = sessionStorage.getItem("tmpAccount")
         if(tmpAccount){
             const account: AccountModel = JSON.parse(tmpAccount);
@@ -87,6 +88,7 @@ class Confirm extends React.Component<any, State> {
             walletWorker.importMnemonic(tmpMnemonic, account.name, account.password ? account.password : "", account.hint ? account.hint : "", "").then(((accountId:any) => {
                 if(accountId){
                     sessionStorage.removeItem("tmpMnemonic");
+                    config.TMP.MNEMONIC = ""
                     sessionStorage.removeItem("tmpAccount");
                     selfStorage.setItem("accountId",accountId)
                     // window.location.href = "/#/"
@@ -101,6 +103,7 @@ class Confirm extends React.Component<any, State> {
             })
         }else{
             sessionStorage.removeItem("tmpMnemonic");
+            config.TMP.MNEMONIC = ""
             url.goTo(url.path_settings(),"")
         }
     }
