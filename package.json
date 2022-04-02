@@ -2,6 +2,7 @@
   "name": "emit-core-account",
   "version": "0.0.1",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@babel/core": "7.12.3",
     "@capacitor/app": "1.1.0",
@@ -131,6 +132,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "3.4.1",
+    "babel-plugin-transform-bigint": "^1.0.12",
     "penpal": "^6.2.2"
   },
   "description": "An Ionic project",

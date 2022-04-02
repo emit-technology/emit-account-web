@@ -150,6 +150,10 @@ class WalletWorker {
         if(!accountId){
             accountId = selfStorage.getItem("accountId");
         }
+        if(!accountId){
+            url.accountCreate()
+            return;
+        }
         return new Promise((resolve, reject)=>{
             if(accountId) {
                 const data:any = selfStorage.getItem(accountId);

@@ -32,7 +32,7 @@ const WorkerPlugin = require("worker-plugin");
 const appPackageJson = require(paths.appPackageJson);
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
-const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
+const shouldUseSourceMap = false;//process.env.GENERATE_SOURCEMAP !== 'false';
 
 const webpackDevClientEntry = require.resolve(
   'react-dev-utils/webpackHotDevClient'
@@ -419,6 +419,7 @@ module.exports = function (webpackEnv) {
                         },
                       },
                     },
+                    require.resolve('babel-plugin-transform-bigint'),
                   ],
                   isEnvDevelopment &&
                     shouldUseReactRefresh &&
@@ -436,7 +437,7 @@ module.exports = function (webpackEnv) {
             // Process any JS outside of the app with Babel.
             // Unlike the application JS, we only compile the standard ES features.
             {
-              test: /\.(js|mjs)$/,
+              test: /\.(mjs)$/,
               exclude: /@babel(?:\/|\\{1,2})runtime/,
               loader: require.resolve('babel-loader'),
               options: {
