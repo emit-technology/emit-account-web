@@ -135,6 +135,7 @@
     "@capacitor/cli": "3.4.1",
     "axios": "^0.26.1",
     "babel-plugin-transform-bigint": "^1.0.12",
+    "copy-to-clipboard": "^3.3.1",
     "penpal": "^6.2.2"
   },
   "description": "An Ionic project",

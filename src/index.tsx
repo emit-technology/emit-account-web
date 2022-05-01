@@ -17,6 +17,8 @@ ReactDOM.render(
 const accountId = selfStorage.getItem("accountId");
 if(accountId){
    url.accountUnlock();
+}else{
+    url.accountCreate();
 }
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

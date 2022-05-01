@@ -431,7 +431,9 @@ class Home extends React.Component<Props, State> {
                 <IonModal isOpen={showAccountDetail} className="common-modal" swipeToClose onDidDismiss={() =>
                     this.setState({showAccountDetail: false})}>
                     {
-                        account && <AccountDetail account={account} showChainId={selectChainId}/>
+                        account && <AccountDetail account={account} showChainId={selectChainId} onClose={()=>{
+                            this.setState({showAccountDetail: false})
+                        }}/>
                     }
                 </IonModal>
                 <IonPopover trigger="accounts" className="accounts-popover" arrow={false} dismissOnSelect>

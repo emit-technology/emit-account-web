@@ -1,21 +1,46 @@
 import * as React from 'react';
 import {AccountModel, ChainType} from "emit-types";
-import {IonChip,IonRow,IonCol,IonButton,IonText} from '@ionic/react'
+import {IonChip, IonRow, IonCol, IonButton, IonText, useIonToast} from '@ionic/react'
 import {config} from "../common/config";
+import copy from 'copy-to-clipboard';
+
 const QRCode = require('qrcode.react');
 
 interface Props{
     account:AccountModel
-    showChainId:ChainType
+    showChainId:ChainType;
+    onClose:()=>void;
 }
 
-export const AccountDetail :React.FC<Props> = ({account,showChainId})=>{
+export const AccountDetail :React.FC<Props> = ({account,onClose,showChainId})=>{
+    const [present, dismiss] = useIonToast();
+
     return <div className="account-box">
         <div className="account-detail">
-            <h1><IonText color="primary">{config.CHAIN_DESCRIPTION[ChainType[showChainId]]}</IonText></h1>
+            <h1><span><IonText color="primary">{config.CHAIN_DESCRIPTION[ChainType[showChainId]]}</IonText></span>
+                <div style={{position:"absolute",right:"20px",top:"6px",color:"#4d4d4d"}} onClick={()=>{
+                    onClose()
+                }}>x</div>
+            </h1>
             <QRCode value={account.addresses[showChainId]} level="L"/>
             <div className="acct-addr">
-                <IonChip color="dark" className="addr-chip">{account.addresses[showChainId]}</IonChip>
+                <IonChip color="dark" id="copied" className="addr-chip" onClick={()=>{
+                    // @ts-ignore
+                    copy(account.addresses[showChainId]);
+
+                    present({
+                        // buttons: [{ text: 'Close', handler: () => dismiss() }],
+                        message: 'Copied to clipboard !',
+                        duration: 600,
+                        position: 'top',
+                        color: 'primary',
+                        cssClass:'toast-default',
+                        animated: true,
+                        onDidDismiss: () => console.log('dismissed'),
+                        onWillDismiss: () => console.log('will dismiss'),
+                    }).catch(e=>console.error(e))
+
+                }}>{account.addresses[showChainId]}</IonChip>
             </div>
         </div>
         <div>
