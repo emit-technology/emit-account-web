@@ -144,6 +144,7 @@ class Url {
     }
 
     accountUnlock() {
+        console.log("unlock account")
         // if (process.env.NODE_ENV == "development"){
         //     walletWorker.unlockWallet("12345678")
         // }else{

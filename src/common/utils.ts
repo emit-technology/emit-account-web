@@ -11,3 +11,15 @@ export const utils = {
     }
 
 }
+
+export function getParentUrl() {
+    let url = "";
+    if (window.parent !== window) {
+        try {
+            url = window.parent.location.href;
+        }catch (e) {
+            url = document.referrer;
+        }
+    }
+    return url;
+}

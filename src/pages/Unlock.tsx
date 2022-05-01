@@ -60,6 +60,7 @@ class Unlock extends React.Component<any, State>{
         const rest = await walletWorker.unlockWallet(password)
         if(rest){
             this.setState({
+                password:"",
                 showProgress:false
             })
             return Promise.resolve()

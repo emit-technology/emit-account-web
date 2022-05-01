@@ -138,7 +138,6 @@ class WalletWorker {
                     console.log (data.error)
                 }else{
                     const tmp:any = data.result;
-                    tmp.addresses[ChainType.BSC] = tmp.addresses[ChainType.ETH]
                     selfStorage.setItem(accountId,tmp)
                     resolve(tmp);
                 }
@@ -187,7 +186,7 @@ class WalletWorker {
                     if(data.error){
                         console.log(data.error);
                         if(data.error.indexOf("unlock") > -1){
-                            url.accountUnlock();
+                            // url.accountUnlock();
                         }
                     }else{
                         const tmp:any = data.result;

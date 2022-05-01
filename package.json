@@ -133,6 +133,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "3.4.1",
+    "axios": "^0.26.1",
     "babel-plugin-transform-bigint": "^1.0.12",
     "penpal": "^6.2.2"
   },

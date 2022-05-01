@@ -5,13 +5,6 @@
     --border-radius: 25px;
 }
 
-.accounts-popover{
-    --height: 90vh;
-    --width: 80vw;
-    --max-width: 300px;
-    --background: #000;
-}
-
 .account-list{
     height: auto;
     max-height: 400px;

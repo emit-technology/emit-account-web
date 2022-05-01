@@ -43,6 +43,11 @@ class Storage{
         localStorage.clear();
     }
 
+    keys = (prefix:string)=>{
+        const keys = localStorage.keys(prefix);
+        return keys;
+    }
+
 }
 const selfStorage = new Storage()
 export default selfStorage
