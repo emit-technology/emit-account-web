@@ -5,6 +5,7 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import './index.css';
 import url from "./common/url";
+import selfStorage from "./common/storage";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -13,8 +14,10 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-url.accountUnlock();
-
+const accountId = selfStorage.getItem("accountId");
+if(accountId){
+   url.accountUnlock();
+}
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://cra.link/PWA
