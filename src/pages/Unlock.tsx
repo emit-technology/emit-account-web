@@ -13,6 +13,8 @@ import {
 import i18n from "../locales/i18n";
 import url from "../common/url";
 import walletWorker from "../worker/walletWorker";
+import {widgetInterVar} from "../common/interval";
+import selfStorage from "../common/storage";
 
 interface State {
     password:string
@@ -20,6 +22,8 @@ interface State {
     toastMessage?:string
     showProgress:boolean
     showPasswordTips:boolean
+
+    accountId: string|undefined;
 }
 
 class Unlock extends React.Component<any, State>{
@@ -29,16 +33,30 @@ class Unlock extends React.Component<any, State>{
         showToast:false,
         toastMessage:"",
         showProgress:false,
-        showPasswordTips:false
+        showPasswordTips:false,
+        accountId:selfStorage.getItem("accountId")
     }
 
     componentDidMount() {
+        const {accountId} = this.state;
         // walletWorker.accountInfo().then(account=>{
         //     if(account && account.accountId){
         //     }else {
         //         url.accountCreate()
         //     }
         // })
+        if (!accountId){
+            if(window.parent){
+                widgetInterVar.start(()=>{
+                   const actId = selfStorage.getItem('accountId');
+                   this.setState({
+                       accountId:actId
+                   })
+                },1000,true,30 * 60 * 1000)
+            }
+        }else{
+
+        }
     }
 
     setShowToast = (f:boolean,m?:string) =>{
@@ -68,7 +86,7 @@ class Unlock extends React.Component<any, State>{
     }
 
     render() {
-        const {showToast,toastMessage,showProgress,password} = this.state;
+        const {showToast,toastMessage,showProgress,password,accountId} = this.state;
 
         return <>
             <IonPage>
@@ -90,7 +108,7 @@ class Unlock extends React.Component<any, State>{
                         <IonList>
                             <IonItem mode="ios">
                                 <IonLabel position="floating"><IonText color="medium">{i18n.t("wallet")} {i18n.t("password")}</IonText></IonLabel>
-                                <IonInput mode="ios" type="password" value={password} onIonChange={(e: any) => {
+                                <IonInput disabled={!accountId} mode="ios" type="password" value={password} onIonChange={(e: any) => {
                                     this.setState({
                                         password:e.target.value!
                                     })

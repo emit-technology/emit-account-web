@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact,IonRow,IonCol,IonSplitPane } from '@ionic/react';
-import { IonReactHashRouter } from '@ionic/react-router';
+import {Redirect, Route} from 'react-router-dom';
+import {IonApp, IonRouterOutlet, setupIonicReact, IonRow, IonCol, IonSplitPane} from '@ionic/react';
+import {IonReactHashRouter} from '@ionic/react-router';
 import Home from './pages/Home';
 import Backup from "./pages/Backup";
 import Confirm from "./pages/Confirm";
@@ -33,41 +33,42 @@ import {ApproveWidget} from "./pages/widget/ApproveWidget";
 import {AccountMenu} from "./components/AccountMenu";
 
 setupIonicReact({
-  mode:"ios"
+    mode: "ios"
 });
 
 const App: React.FC = () => {
-  const routerRef = React.useRef<HTMLIonRouterOutletElement | null>(null);
-  return (
-      <div className="page">
-        <div className="page-inner">
-        <IonApp>
-          <IonReactHashRouter>
-            {/*<IonSplitPane contentId="main">*/}
-            {/*<AccountMenu/>*/}
-            <IonRouterOutlet id="main">
-              <Route exact path="/home" render={() => <Home router={routerRef.current} refresh={Math.floor(Date.now()/1000)}/>}/>
-              <Route path="/account/create" component={CreateAccount} exact={true}/>
-              <Route path="/account/backup" component={Backup} exact={true}/>
-              <Route path="/account/confirm" component={Confirm} exact={true}/>
-              <Route path="/account/import" component={ImportAccount} exact={true}/>
-              <Route path="/account/unlock" component={Unlock} exact={true}/>
+    const routerRef = React.useRef<HTMLIonRouterOutletElement | null>(null);
+    return (
+        <div className="page">
+            <div className="page-inner">
+                <IonApp>
+                    <IonReactHashRouter>
+                        {/*<IonSplitPane contentId="main">*/}
+                        {/*<AccountMenu/>*/}
+                        <IonRouterOutlet id="main">
+                            <Route exact path="/home" render={() => <Home router={routerRef.current}
+                                                                          refresh={Math.floor(Date.now() / 1000)}/>}/>
+                            <Route path="/account/create" component={CreateAccount} exact={true}/>
+                            <Route path="/account/backup" component={Backup} exact={true}/>
+                            <Route path="/account/confirm" component={Confirm} exact={true}/>
+                            <Route path="/account/import" component={ImportAccount} exact={true}/>
+                            <Route path="/account/unlock" component={Unlock} exact={true}/>
 
-              <Route path="/widget/sign/tx" component={SignTxWidget} exact={true}/>
-              <Route path="/widget/sign/msg" component={SignMessageWidget} exact={true}/>
-              <Route path="/widget/approve" component={ApproveWidget} exact={true}/>
+                            <Route path="/widget/sign/tx" component={SignTxWidget} exact={true}/>
+                            <Route path="/widget/sign/msg" component={SignMessageWidget} exact={true}/>
+                            <Route path="/widget/approve" component={ApproveWidget} exact={true}/>
 
-              <Route exact path="/">
-                <Redirect to="/home"/>
-              </Route>
-            </IonRouterOutlet>
-            {/*</IonSplitPane>*/}
+                            <Route exact path="/">
+                                <Redirect to="/home"/>
+                            </Route>
+                        </IonRouterOutlet>
+                        {/*</IonSplitPane>*/}
 
-          </IonReactHashRouter>
-        </IonApp>
+                    </IonReactHashRouter>
+                </IonApp>
+            </div>
         </div>
-      </div>
-  )
+    )
 }
 
 export default App;

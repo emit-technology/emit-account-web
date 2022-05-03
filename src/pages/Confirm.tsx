@@ -95,6 +95,7 @@ class Confirm extends React.Component<any, State> {
                     // window.location.reload();
                     selfStorage.setItem("viewedSlide",true);
                     url.home();
+                    window.location.reload();
                 }
             })).catch(()=>{
                 this.setState({

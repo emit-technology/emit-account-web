@@ -51,7 +51,7 @@ interface State {
     config?: IConfig,
     op: Operation,
     msg?: any,
-    tx?:any
+    tx?: any
 }
 
 enum Operation {
@@ -91,11 +91,11 @@ class Home extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-        if(prevProps.refresh != this.props.refresh){
-            const {connection,config} = this.state;
-            this.initAccount().then((act)=>{
-                if(config){
-                    connection.promise.then(parent=>{
+        if (prevProps.refresh != this.props.refresh || prevState.account.accountId != this.state.account.accountId) {
+            const {connection, config} = this.state;
+            this.initAccount().then((act) => {
+                if (config) {
+                    connection.promise.then(parent => {
                         parent.onActiveWalletChanged(act.addresses[config.network.chainType])
                     });
                 }
@@ -111,27 +111,26 @@ class Home extends React.Component<Props, State> {
             // Methods child is exposing to parent.
             methods: {
                 getAccounts: (config) => {
-                    try{
+                    try {
                         return this.getAccounts(config)
-                    }catch (e){
-                        const err = typeof e == 'string'?e:e.message;
+                    } catch (e) {
+                        const err = typeof e == 'string' ? e : e.message;
                         return Promise.resolve({error: err, result: []})
                     }
                 },
-                signTransaction: (txParams,config)=>{
-                    console.log("entry sign Tx",txParams,config);
-                    try{
-                        return this.signTransaction(txParams,config)
-                    }catch (e){
-                        const err = typeof e == 'string'?e:e.message;
+                signTransaction: (txParams, config) => {
+                    try {
+                        return this.signTransaction(txParams, config)
+                    } catch (e) {
+                        const err = typeof e == 'string' ? e : e.message;
                         return Promise.resolve({error: err, result: ""})
                     }
                 },
                 signMessage: (msgParams: any, config: IConfig) => {
-                    try{
+                    try {
                         return this.signMessage(msgParams, config)
-                    }catch (e){
-                        const err = typeof e == 'string'?e:e.message;
+                    } catch (e) {
+                        const err = typeof e == 'string' ? e : e.message;
                         return Promise.resolve({error: err, result: ""})
                     }
                 },
@@ -149,7 +148,7 @@ class Home extends React.Component<Props, State> {
         // await this.initAccount()
     }
 
-    initAccount = async ()=>{
+    initAccount = async () => {
         const acct = await walletWorker.accountInfoAsync();
         const accounts = await walletWorker.accounts();
         this.setState({
@@ -161,41 +160,31 @@ class Home extends React.Component<Props, State> {
     }
 
     checkIsLocked = async () => {
-        const {connection} = this.state;
-        const parent = await connection.promise;
-        return new Promise((resolve, reject) => {
-            walletWorker.isLocked().then(isLocked => {
-                parent.setHeight(BOX_HEIGHT);
-                if(isLocked){
-                    url.accountUnlock();
-                    reject("Wallet is locked!")//locked
-                }else{
-                    resolve("Wallet is unlocked!")//unlock
-                }
-            }).catch(e => {
-                parent.setHeight(BOX_HEIGHT);
-                reject(e)
-            });
-        })
+        const isLocked = await walletWorker.isLocked();
+        if (isLocked) {
+            await this._showWidget()
+            url.accountUnlock();
+            await this.waitUnlock();
+        }
+        return Promise.resolve(true);
     }
 
     checkApprove = async (config?: IConfig) => {
-        const {account} = this.state;
+        // const {account} = this.state;
         const refer = getParentUrl();
-        if(config){
-            this.setState({ config: config })
+        if (config) {
+            this.setState({config: config})
         }
-        await this.checkIsLocked();
         if (refer) {
-            await this._showWidget();
             const oHash = window.location.hash;
-            if (oHash && oHash.indexOf("home")>-1){
+            if (oHash && oHash.indexOf("home") > -1) {
+                const accountId = selfStorage.getItem("accountId")
                 let host = refer.replace("http://", "").replace("https://", "");
                 host = host.substr(0, host.indexOf("/"));
-                if (!dappData.get(host) || dappData.get(host).indexOf(account.accountId) == -1) {
+                if (!dappData.get(host) || dappData.get(host).indexOf(accountId) == -1) {
                     this.setShowApproveDAppModal(true)
-                    await this.confirmOperation();
-                    dappData.set(host, account.accountId);
+                    await this.waitOperation();
+                    dappData.set(host, accountId);
                 }
             }
         } else {
@@ -203,24 +192,37 @@ class Home extends React.Component<Props, State> {
         }
     }
 
-    confirmOperation = async () => {
-        for (let i = 0; i < 120; i++) {
+    waitUnlock = async (): Promise<boolean> => {
+        for (let i = 0; i < 240; i++) {
             await this.waitTime();
-            const {op} = this.state;
-            console.log(op,i,"looooop")
-            if (op === Operation.cancel) {
-                this.setState({op: Operation._})
-                return Promise.reject("Cancel")
-            } else if (op === Operation.reject) {
-                this.setState({op: Operation._})
-                return Promise.reject("Reject")
-            } else if (op === Operation.confirm) {
-                this.setState({op: Operation._})
-                return Promise.resolve("Confirm")
+            const f = await walletWorker.isLocked()
+            if (!f) {
+                return true;
             }
         }
-        this.setState({op: Operation._,showTransactionModal:false,showSignMessageModal:false,showApproveModal:false})
-        return Promise.reject("Cancel")
+        return false;
+    }
+
+    waitOperation = async () => {
+        let latestOp:Operation = Operation._;
+        for (let i = 0; i < 240; i++) {
+            await this.waitTime();
+            const {op} = this.state;
+            if (op !== Operation._) {
+                latestOp = op;
+                break;
+            }
+        }
+        this.setState({
+            op: Operation._,
+            showTransactionModal: false,
+            showSignMessageModal: false,
+            showApproveModal: false
+        })
+        if(latestOp == Operation.confirm){
+            return Promise.resolve(Operation[latestOp]);
+        }
+        return Promise.reject(Operation[latestOp])
     }
 
     waitTime = async (defaultSecond = 0.5) => {
@@ -231,9 +233,40 @@ class Home extends React.Component<Props, State> {
         })
     }
 
+
+    checkAccountExist = async (): Promise<boolean> => {
+        const accountId = selfStorage.getItem("accountId");
+        if (!accountId) {
+            url.accountOpenCreate();
+            await this.waitAccountCreate();
+        }
+        return Promise.resolve(true);
+    }
+
+    waitAccountCreate = async () => {
+        for (let i = 0; i < 240; i++) {
+            await this.waitTime(1);
+            if(this.getStorageAccountId()){
+                break;
+            }
+        }
+        return Promise.resolve(true);
+    }
+
+    getStorageAccountId = ()=>{
+        return selfStorage.getItem("accountId");
+    }
+
     getAccounts = async (config: IConfig): Promise<{ error: string, result: Array<string> }> => {
         let err = "";
+        // check account exist?waitAccountCreate
+        // check lock status and show widget
+        // check approve status
+        // TODO do something
+        // hide widget?
         try {
+            await this.checkAccountExist();
+            await this.checkIsLocked();
             await this.checkApprove(config)
         } catch (e) {
             err = typeof e == "string" ? e : e.message;
@@ -249,53 +282,69 @@ class Home extends React.Component<Props, State> {
     }
 
     signTransaction = async (txParams: any, config: IConfig): Promise<{ error: string, result: string }> => {
-        if(!txParams.nonce){
+        if (!txParams.nonce) {
             //TODO for test
             txParams.nonce = 1;
         }
-       try{
-           await this._showWidget();
-           await this.checkIsLocked();
-           this.setState({ config: config,tx:txParams, showTransactionModal:true })
-           await this.confirmOperation();
-           await this._hideWidget()
-
-           let chainParams: any;
-           if (config.network.chainType == ChainType.ETH || config.network.chainType == ChainType.BSC) {
-               chainParams = {
-                   baseChain: "mainnet",
-                   customer: {name: "mainnet", networkId: 1, chainId: 1,},
-                   hardfork: "byzantium"
-               }
-           }
-           const ret = await walletWorker.signTx("", "", config.network.chainType, txParams, chainParams)
-           return {error: "", result: `0x${ret}`}
-       }catch (e){
-           const err = typeof e == 'string'?e:e.message;
-           return {error:err,result:""}
-       }
+        if (!txParams.from) {
+            return {error: "from address is required! ", result: ""}
+        }
+        const {account, accounts} = this.state;
+        if (txParams.from.toLowerCase() !== account.addresses[config.network.chainType].toLowerCase()) {
+            const ret = accounts.find((v) => {
+                return v.addresses[config.network.chainType].toLowerCase() === txParams.from.toLowerCase();
+            })
+            if (ret) {
+                await this.setAccount(ret);
+            } else {
+                url.accountOpenCreate()
+                await this.waitAccountCreate();
+                return {error: "Can not find account with from address ! ", result: ""}
+            }
+        }
+        try {
+            await this.checkIsLocked();
+            await this.checkApprove(config)
+            this.setState({config: config, tx: txParams, showTransactionModal: true})
+            await this.waitOperation();
+            let chainParams: any;
+            if (config.network.chainType == ChainType.ETH || config.network.chainType == ChainType.BSC) {
+                chainParams = {
+                    baseChain: "mainnet",
+                    customer: {name: "mainnet", networkId: 1, chainId: 1,},
+                    hardfork: "byzantium"
+                }
+            }
+            const ret = await walletWorker.signTx("", "", config.network.chainType, txParams, chainParams)
+            await this._hideWidget();
+            return {error: "", result: `0x${ret}`}
+        } catch (e) {
+            const err = typeof e == 'string' ? e : e.message;
+            return {error: err, result: ""}
+        }
     }
 
     signMessage = async (msgParams: any, config: IConfig): Promise<{ error: string, result: string }> => {
-        if(config){
-            this.setState({ config: config,msg:msgParams })
+        if (config) {
+            this.setState({config: config, msg: msgParams})
         }
-        await this._showWidget();
+        await this.checkAccountExist();
         await this.checkIsLocked();
-        this.setState({ showSignMessageModal:true })
-        await this.confirmOperation();
+        await this.checkApprove(config)
+        this.setState({showSignMessageModal: true})
+        await this.waitOperation();
         const ret = await walletWorker.personSignMsg(config.network.chainType, msgParams)
         await this._hideWidget()
         return {error: null, result: ret}
     }
 
-    _showWidget = async ()=>{
+    _showWidget = async () => {
         const {connection} = this.state;
         const parent = await connection.promise;
         parent.setHeight(BOX_HEIGHT);
     }
 
-    _hideWidget = async ()=>{
+    _hideWidget = async () => {
         const {connection} = this.state;
         const parent = await connection.promise;
         parent.setHeight(0);
@@ -303,13 +352,13 @@ class Home extends React.Component<Props, State> {
 
     // TODO ADD RPC PROXY
     relay = async (payload: IPayload, config: IConfig): Promise<{ error: string, result: any }> => {
-        try{
-            const rest = await jsonRpc(config.network.nodeUrl,payload);
+        try {
+            const rest = await jsonRpc(config.network.nodeUrl, payload);
             return {error: "", result: rest}
-        }catch(e){
+        } catch (e) {
             console.error(e)
-            const err = typeof e == 'string'?e:e.message;
-           return {error:err,result:""}
+            const err = typeof e == 'string' ? e : e.message;
+            return {error: err, result: ""}
         }
     }
 
@@ -321,7 +370,7 @@ class Home extends React.Component<Props, State> {
     }
 
     setConfig = (config: IConfig): Promise<void> => {
-        this.checkApprove(config)
+        // this.checkApprove(config)
         return
     }
 
@@ -379,7 +428,7 @@ class Home extends React.Component<Props, State> {
     }
 
     render() {
-        const {account, selectChainId, showTransactionModal,config,msg,tx, showApproveModal, showAccessedWebsite, showSignMessageModal, showAccountDetail, accounts} = this.state;
+        const {account, selectChainId, showTransactionModal, config, msg, tx, showApproveModal, showAccessedWebsite, showSignMessageModal, showAccountDetail, accounts} = this.state;
         return (
             <IonPage>
                 <IonHeader>
@@ -401,28 +450,46 @@ class Home extends React.Component<Props, State> {
                     {
                         tx &&
                         <SignTxWidget showModal={showTransactionModal}
-                                      onCancel={() => { this.setState({ showTransactionModal: false }) }}
-                                      onOk={() => { this.setState({ showTransactionModal: false, op: Operation.confirm }) }}
-                                      onReject={()=>{ this.setState({ showTransactionModal: false, op: Operation.reject }) }}
+                                      onCancel={() => {
+                                          this.setState({showTransactionModal: false})
+                                      }}
+                                      onOk={() => {
+                                          this.setState({showTransactionModal: false, op: Operation.confirm})
+                                      }}
+                                      onReject={() => {
+                                          this.setState({showTransactionModal: false, op: Operation.reject})
+                                      }}
                                       router={this.props.router} transaction={tx}/>
                     }
 
                     {
                         msg &&
-                        <SignMessageWidget  showModal={showSignMessageModal}
-                                            onCancel={() => { this.setState({ showSignMessageModal: false }) }}
-                                            onOk={() => { this.setState({ showSignMessageModal: false, op: Operation.confirm }) }}
-                                            onReject={()=>{ this.setState({ showSignMessageModal: false, op: Operation.reject }) }}
-                                            router={this.props.router} msg={msg} account={account} config={config}/>
+                        <SignMessageWidget showModal={showSignMessageModal}
+                                           onCancel={() => {
+                                               this.setState({showSignMessageModal: false})
+                                           }}
+                                           onOk={() => {
+                                               this.setState({showSignMessageModal: false, op: Operation.confirm})
+                                           }}
+                                           onReject={() => {
+                                               this.setState({showSignMessageModal: false, op: Operation.reject})
+                                           }}
+                                           router={this.props.router} msg={msg} account={account} config={config}/>
                     }
 
                     {
                         account && config &&
                         <ApproveWidget showModal={showApproveModal}
-                            onCancel={() => { this.setState({ showApproveModal: false }) }}
-                            onOk={() => { this.setState({ showApproveModal: false, op: Operation.confirm }) }}
-                            onReject={()=>{ this.setState({ showApproveModal: false, op: Operation.reject }) }}
-                            router={this.props.router} config={config} account={account}
+                                       onCancel={() => {
+                                           this.setState({showApproveModal: false})
+                                       }}
+                                       onOk={() => {
+                                           this.setState({showApproveModal: false, op: Operation.confirm})
+                                       }}
+                                       onReject={() => {
+                                           this.setState({showApproveModal: false, op: Operation.reject})
+                                       }}
+                                       router={this.props.router} config={config} account={account}
                         />
                     }
 
@@ -431,7 +498,7 @@ class Home extends React.Component<Props, State> {
                 <IonModal isOpen={showAccountDetail} className="common-modal" swipeToClose onDidDismiss={() =>
                     this.setState({showAccountDetail: false})}>
                     {
-                        account && <AccountDetail account={account} showChainId={selectChainId} onClose={()=>{
+                        account && <AccountDetail account={account} showChainId={selectChainId} onClose={() => {
                             this.setState({showAccountDetail: false})
                         }}/>
                     }
@@ -468,10 +535,10 @@ class Home extends React.Component<Props, State> {
                                 <IonIcon icon={downloadOutline} slot="start"/>
                                 <IonLabel>Import Account</IonLabel>
                             </IonItem>
-                            <IonItem>
-                                <IonIcon icon={settingsOutline} slot="start"/>
-                                <IonLabel>Settings</IonLabel>
-                            </IonItem>
+                            {/*<IonItem>*/}
+                            {/*    <IonIcon icon={settingsOutline} slot="start"/>*/}
+                            {/*    <IonLabel>Settings</IonLabel>*/}
+                            {/*</IonItem>*/}
                         </IonList>
                     </IonContent>
                 </IonPopover>

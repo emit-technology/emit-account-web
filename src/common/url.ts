@@ -75,6 +75,8 @@ class Url {
     constructor() {
     }
 
+    _win: Window | null;
+
     path_settings = () => {
         return [this.base, this.settings.setting].join("/")
     }
@@ -125,6 +127,12 @@ class Url {
 
     accountCreate(pre?:string) {
         this.goTo([this.base, this.account.create].join("/"), pre?pre:"");
+    }
+
+    accountOpenCreate() {
+        const i=Math.max((window.screen.width-427)/2,20);
+        const a="popup=1,height=780,width=427,top="+Math.max((window.screen.height-780)/2,20)+",left="+i;
+        this._win = window.open([this.base, this.account.create].join("/"),"account_popup_win_"+Date.now(),a);
     }
 
     accountBackup(pre?: string) {
