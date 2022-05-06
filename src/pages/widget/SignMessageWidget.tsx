@@ -37,6 +37,7 @@ export const SignMessageWidget: React.FC<Props> = ({
                                                    }) => {
     const refer = getParentUrl();
 
+    console.log(refer,showModal,"showmodal:")
     return (
         <>
             {/* Card Modal */}

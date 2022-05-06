@@ -28,7 +28,7 @@ import selfStorage from "../common/storage";
 import Avatar from 'react-avatar';
 import {AccountModel, ChainType} from "../types";
 import {connectToParent} from "penpal";
-import {IConfig, IPayload} from "@emit-technology/emit-account-node-sdk";
+import {IConfig, IPayload, SignWrapped} from "@emit-technology/emit-account-node-sdk";
 import {SignTxWidget} from "./widget/SignTxWidget";
 import {ApproveWidget, SignMessageWidget} from "./widget";
 import {getParentUrl, utils} from "../common/utils";
@@ -94,11 +94,17 @@ class Home extends React.Component<Props, State> {
         if (prevProps.refresh != this.props.refresh || prevState.account.accountId != this.state.account.accountId) {
             const {connection, config} = this.state;
             this.initAccount().then((act) => {
-                if (config) {
+                if(connection){
+                    if (config) {
+                        connection.promise.then(parent => {
+                            parent.onActiveWalletChanged(act.addresses[config.network.chainType])
+                        });
+                    }
                     connection.promise.then(parent => {
-                        parent.onActiveWalletChanged(act.addresses[config.network.chainType])
+                        parent.onActiveAccountChanged(act)
                     });
                 }
+
             }).catch(e => {
                 console.error(e)
             })
@@ -136,7 +142,8 @@ class Home extends React.Component<Props, State> {
                 },
                 relay: this.relay,
                 showWidget: this.showWidget,
-                setConfig: this.setConfig
+                setConfig: this.setConfig,
+                batchSignMessage:  this.batchSignMsg,
             },
         });
 
@@ -146,6 +153,31 @@ class Home extends React.Component<Props, State> {
         })
 
         // await this.initAccount()
+    }
+
+    batchSignMsg = async (signArr:Array<SignWrapped>) : Promise<{error:string;result:Array<SignWrapped>}> =>{
+        console.log("batchSignMessage",console.log(this.state.showSignMessageModal));
+        let err = "";
+        const ret:Array<SignWrapped> = [];
+        try{
+            await this.checkAccountExist();
+            await this.checkIsLocked();
+            await this.checkApprove()
+            this.setShowSignMessageModal(true)
+            await this.waitOperation();
+            for(let msg of signArr){
+                msg.result  = await walletWorker.personSignMsg(msg.chain, msg.msg)
+                ret.push(msg)
+            }
+            await this._hideWidget()
+        }catch(e){
+            err = typeof e == 'string'?e:e.message;
+        }
+        if(err){
+            return {error: err, result:[]}
+        }
+        console.log(err,ret,"sign ret::")
+        return {error:"",result:ret}
     }
 
     initAccount = async () => {
@@ -366,6 +398,7 @@ class Home extends React.Component<Props, State> {
         // await this.checkAndSetConfig(config)
         const {connection} = this.state;
         const parent = await connection.promise;
+        console.log(config,"showWidget");
         parent.setHeight(BOX_HEIGHT)
     }
 
@@ -429,6 +462,7 @@ class Home extends React.Component<Props, State> {
 
     render() {
         const {account, selectChainId, showTransactionModal, config, msg, tx, showApproveModal, showAccessedWebsite, showSignMessageModal, showAccountDetail, accounts} = this.state;
+        console.log(showSignMessageModal,"render");
         return (
             <IonPage>
                 <IonHeader>
@@ -463,7 +497,6 @@ class Home extends React.Component<Props, State> {
                     }
 
                     {
-                        msg &&
                         <SignMessageWidget showModal={showSignMessageModal}
                                            onCancel={() => {
                                                this.setState({showSignMessageModal: false})
@@ -474,7 +507,8 @@ class Home extends React.Component<Props, State> {
                                            onReject={() => {
                                                this.setState({showSignMessageModal: false, op: Operation.reject})
                                            }}
-                                           router={this.props.router} msg={msg} account={account} config={config}/>
+                                           router={this.props.router} msg={"1111"} account={account} config={config}/>
+
                     }
 
                     {
