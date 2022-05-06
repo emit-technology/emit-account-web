@@ -144,6 +144,7 @@ class Home extends React.Component<Props, State> {
                 showWidget: this.showWidget,
                 setConfig: this.setConfig,
                 batchSignMessage:  this.batchSignMsg,
+                requestAccount: this.requestAccount,
             },
         });
 
@@ -175,6 +176,25 @@ class Home extends React.Component<Props, State> {
         }
         if(err){
             return {error: err, result:[]}
+        }
+        console.log(err,ret,"sign ret::")
+        return {error:"",result:ret}
+    }
+
+    requestAccount = async (config: IConfig) : Promise<{error:string;result:AccountModel}> =>{
+        let err = "";
+        let ret:AccountModel = {name:""};
+        try{
+            await this.checkAccountExist();
+            await this.checkIsLocked();
+            await this.checkApprove()
+            await this._hideWidget()
+            ret = await walletWorker.accountInfo();
+        }catch(e){
+            err = typeof e == 'string'?e:e.message;
+        }
+        if(err){
+            return {error: err, result:ret}
         }
         console.log(err,ret,"sign ret::")
         return {error:"",result:ret}
