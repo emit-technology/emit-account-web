@@ -103,6 +103,7 @@ class ImportAccount extends React.Component<any, State> {
                     // window.location.reload();
                     selfStorage.setItem("viewedSlide",true);
                     url.home();
+                    window.location.reload();
                 }
             })).catch((e)=>{
                 const err = typeof e === "string"?e:e.message;
@@ -123,6 +124,7 @@ class ImportAccount extends React.Component<any, State> {
                     // window.location.reload();
                     selfStorage.setItem("viewedSlide",true);
                     url.home();
+                    window.location.reload();
                 }
             })).catch((e)=>{
                 const err = typeof e === "string"?e:e.message;

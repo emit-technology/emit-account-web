@@ -184,7 +184,6 @@ class Home extends React.Component<Props, State> {
         if(err){
             return {error: err, result:[]}
         }
-        console.log(err,ret,"sign ret::")
         return {error:"",result:ret}
     }
 
@@ -194,16 +193,16 @@ class Home extends React.Component<Props, State> {
         try{
             await this.checkAccountExist();
             await this.checkIsLocked();
-            await this.checkApprove()
+            await this.checkApprove(config)
             await this._hideWidget()
-            ret = await walletWorker.accountInfo();
+            ret = await walletWorker.accountInfoAsync();
         }catch(e){
+            console.error(e)
             err = typeof e == 'string'?e:e.message;
         }
         if(err){
             return {error: err, result:ret}
         }
-        console.log(err,ret,"sign ret::")
         return {error:"",result:ret}
     }
 
@@ -393,7 +392,6 @@ class Home extends React.Component<Props, State> {
         this.setState({showSignMessageModal: true})
         await this._showWidget();
         await this.waitOperation();
-        console.log(msgParams,"msgParams");
         const ret = await walletWorker.personSignMsg(config.network.chainType, msgParams)
         await this._hideWidget()
         return {error: null, result: ret}
@@ -427,7 +425,6 @@ class Home extends React.Component<Props, State> {
         // await this.checkAndSetConfig(config)
         const {connection} = this.state;
         const parent = await connection.promise;
-        console.log(config,"showWidget");
         parent.setHeight(BOX_HEIGHT)
     }
 
@@ -491,7 +488,6 @@ class Home extends React.Component<Props, State> {
 
     render() {
         const {account, selectChainId, showTransactionModal, config, msg, tx, showApproveModal, showAccessedWebsite, showSignMessageModal, showAccountDetail, accounts} = this.state;
-        console.log(showSignMessageModal,"render");
         return (
             <IonPage>
                 <IonHeader>
