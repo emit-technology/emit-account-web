@@ -34,6 +34,7 @@ import {ApproveWidget, SignMessageWidget} from "./widget";
 import {getParentUrl, utils} from "../common/utils";
 import {dappData} from "../data";
 import {jsonRpc} from "../rpc";
+import * as web3Utils from 'web3-utils';
 
 interface State {
     account: AccountModel,
@@ -157,7 +158,6 @@ class Home extends React.Component<Props, State> {
     }
 
     batchSignMsg = async (signArr:Array<SignWrapped>) : Promise<{error:string;result:Array<SignWrapped>}> =>{
-        console.log("batchSignMessage",console.log(this.state.showSignMessageModal));
         let err = "";
         const ret:Array<SignWrapped> = [];
         try{
@@ -165,9 +165,16 @@ class Home extends React.Component<Props, State> {
             await this.checkIsLocked();
             await this.checkApprove()
             this.setShowSignMessageModal(true)
+            await this._showWidget();
             await this.waitOperation();
+            const {account} = this.state;
             for(let msg of signArr){
-                msg.result  = await walletWorker.personSignMsg(msg.chain, msg.msg)
+                const message = typeof msg.msg == 'string' && !web3Utils.isHexStrict(msg.msg) ?{
+                    from: account.addresses[msg.chain],
+                    data:  web3Utils.utf8ToHex(msg.msg),
+                    messageStandard: 'signPersonalMessage'
+                } :msg.msg
+                msg.result  = await walletWorker.personSignMsg(msg.chain,message )
                 ret.push(msg)
             }
             await this._hideWidget()
@@ -384,7 +391,9 @@ class Home extends React.Component<Props, State> {
         await this.checkIsLocked();
         await this.checkApprove(config)
         this.setState({showSignMessageModal: true})
+        await this._showWidget();
         await this.waitOperation();
+        console.log(msgParams,"msgParams");
         const ret = await walletWorker.personSignMsg(config.network.chainType, msgParams)
         await this._hideWidget()
         return {error: null, result: ret}

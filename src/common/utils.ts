@@ -8,6 +8,10 @@ export const utils = {
             return v.slice(0, num) + " ... " + v.slice(v.length - num, v.length);
         }
         return v
+    },
+
+    signFormae :function (){
+
     }
 
 }
