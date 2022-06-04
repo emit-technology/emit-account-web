@@ -1,5 +1,5 @@
 body {
-    background: #0c0c0c;
+    /*background: #0c0c0c;*/
 }
 
 .ion-page {
@@ -37,11 +37,13 @@ body {
     }
 
     .accounts-popover {
-        --offset-x: - calc(( 100vw - 768px) / 2);
-        --offset-y: calc((100vh - 1580px) / 2);
+        --offset-x: - calc(50vw - 384px);
+        --offset-y: calc(50vh - 667px);
         --max-width: 360px !important;
     }
-
+    .pre-data{
+        max-height: 180px !important;
+    }
 }
 
 pre {

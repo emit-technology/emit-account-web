@@ -17,7 +17,7 @@
  */
 
 import service from 'walletService';
-import {AccountModel, ChainType} from "emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-types";
 import selfStorage from "../common/storage";
 import url from "../common/url";
 
@@ -122,7 +122,6 @@ class WalletWorker {
                     reject(data.error);
                 }else{
                     const tmp: Array<AccountModel> = data.result;
-                    console.log(tmp)
                     resolve(tmp);
                 }
             })
@@ -266,9 +265,33 @@ class WalletWorker {
         })
     }
 
-    async personSignMsg(chainType:ChainType,msg:any):Promise<string> {
+    async personSignMsg(chainType:ChainType,msg:any,accountId:string):Promise<string> {
         return new Promise((resolve, reject) => {
-            service.personSignMessage(chainType,msg,function (data:any){
+            service.personSignMessage(chainType,msg,accountId,function (data:any){
+                if(data.error){
+                    reject(data.error);
+                }else{
+                    resolve(data.result);
+                }
+            })
+        })
+    }
+
+    async signTypedMessage(chainType:ChainType,msg:any,version:string,accountId:string):Promise<string> {
+        return new Promise((resolve, reject) => {
+            service.signTypedMessage(chainType,msg,version,accountId,function (data:any){
+                if(data.error){
+                    reject(data.error);
+                }else{
+                    resolve(data.result);
+                }
+            })
+        })
+    }
+
+    async setBackedUp(accountId:string):Promise<string> {
+        return new Promise((resolve, reject) => {
+            service.setBackedUp(accountId,function (data:any){
                 if(data.error){
                     reject(data.error);
                 }else{

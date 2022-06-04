@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Redirect, Route} from 'react-router-dom';
+import {Redirect, Route, Switch} from 'react-router-dom';
 import {IonApp, IonRouterOutlet, setupIonicReact, IonRow, IonCol, IonSplitPane} from '@ionic/react';
 import {IonReactHashRouter} from '@ionic/react-router';
 import Home from './pages/Home';
@@ -27,10 +27,8 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
-import {SignTxWidget} from "./pages/widget/SignTxWidget";
-import {SignMessageWidget} from "./pages/widget/SignMessageWidget";
-import {ApproveWidget} from "./pages/widget/ApproveWidget";
-import {AccountMenu} from "./components/AccountMenu";
+import {SignTxWidgetWeb3,SignMessageWidget,ApproveWidget,WidgetPage} from "./pages/widget";
+// import {AccountMenu} from "./components/AccountMenu";
 
 setupIonicReact({
     mode: "ios"
@@ -45,23 +43,30 @@ const App: React.FC = () => {
                     <IonReactHashRouter>
                         {/*<IonSplitPane contentId="main">*/}
                         {/*<AccountMenu/>*/}
-                        <IonRouterOutlet id="main">
-                            <Route exact path="/home" render={() => <Home router={routerRef.current}
-                                                                          refresh={Math.floor(Date.now() / 1000)}/>}/>
-                            <Route path="/account/create" component={CreateAccount} exact={true}/>
-                            <Route path="/account/backup" component={Backup} exact={true}/>
-                            <Route path="/account/confirm" component={Confirm} exact={true}/>
-                            <Route path="/account/import" component={ImportAccount} exact={true}/>
-                            <Route path="/account/unlock" component={Unlock} exact={true}/>
+                        <Switch>
+                            <IonRouterOutlet id="main">
+                                <Route exact path="/home/:op" render={(props) => <Home op={props.match.params.op} router={routerRef.current}
+                                                                              refresh={Math.floor(Date.now() / 1000)}/>}/>
+                                <Route exact path="/home" render={() => <Home router={routerRef.current}
+                                                                              refresh={Math.floor(Date.now() / 1000)}/>}/>
+                                <Route path="/account/create" component={CreateAccount} exact={true}/>
+                                <Route path="/account/backup" component={Backup} exact={true}/>
+                                <Route path="/account/confirm" component={Confirm} exact={true}/>
+                                <Route path="/account/import" component={ImportAccount} exact={true}/>
+                                <Route path="/account/unlock" component={Unlock} exact={true}/>
 
-                            <Route path="/widget/sign/tx" component={SignTxWidget} exact={true}/>
-                            <Route path="/widget/sign/msg" component={SignMessageWidget} exact={true}/>
-                            <Route path="/widget/approve" component={ApproveWidget} exact={true}/>
+                                <Route path="/widget/sign/tx" component={SignTxWidgetWeb3} exact={true}/>
+                                <Route path="/widget/sign/msg" component={SignMessageWidget} exact={true}/>
+                                <Route path="/widget/approve" component={ApproveWidget} exact={true}/>
+                                <Route path="/widget" render={() => <WidgetPage router={routerRef.current}
+                                                                                refresh={Math.floor(Date.now() / 1000)}/>}
+                                       exact={true}/>
 
-                            <Route exact path="/">
-                                <Redirect to="/home"/>
-                            </Route>
-                        </IonRouterOutlet>
+                                <Route exact path="/">
+                                    <Redirect to="/home"/>
+                                </Route>
+                            </IonRouterOutlet>
+                        </Switch>
                         {/*</IonSplitPane>*/}
 
                     </IonReactHashRouter>

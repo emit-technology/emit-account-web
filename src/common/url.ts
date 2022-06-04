@@ -30,8 +30,8 @@ class Url {
     }
 
     private transaction = {
-        tunnel:"tunnel",
-        tunnelNFT:"tunnel-nft",
+        tunnel: "tunnel",
+        tunnelNFT: "tunnel-nft",
         transfer: "transfer",
         transferNft: "transfer-nft",
         list: "transaction/list",
@@ -40,15 +40,15 @@ class Url {
 
     private settings = {
         setting: "tabs/settings",
-        about:"manage/about",
+        about: "manage/about",
     }
 
     private epoch = {
-        index : "tabs/epoch",
-        altar : "epoch/altar",
-        chaos : "epoch/chaos",
-        deviceRank : "epoch/device/rank",
-        driverRank : "epoch/driver/rank",
+        index: "tabs/epoch",
+        altar: "epoch/altar",
+        chaos: "epoch/chaos",
+        deviceRank: "epoch/device/rank",
+        driverRank: "epoch/driver/rank",
         poolHashRate: "epoch/pool/hashrate",
         poolInfo: "epoch/pool/info",
         freeze: "epoch/freeze",
@@ -66,9 +66,9 @@ class Url {
     private swapWEth = "swap/eth";
 
     private exchange = {
-        market:"trade/market",
-        swap:"trade/swap",
-        marketSearch:"trade/market/search",
+        market: "trade/market",
+        swap: "trade/swap",
+        marketSearch: "trade/market/search",
         marketStatics: "trade/market/statics"
     }
 
@@ -80,6 +80,7 @@ class Url {
     path_settings = () => {
         return [this.base, this.settings.setting].join("/")
     }
+
     /**
      * go to page
      * @param path
@@ -125,14 +126,26 @@ class Url {
         return
     }
 
-    accountCreate(pre?:string) {
-        this.goTo([this.base, this.account.create].join("/"), pre?pre:"");
+    closeTopWindow = () => {
+        if (this._win) {
+            this._win.close();
+        }
+    }
+
+    accountCreate(pre?: string) {
+        this.goTo([this.base, this.account.create].join("/"), pre ? pre : "");
     }
 
     accountOpenCreate() {
-        const i=Math.max((window.screen.width-427)/2,20);
-        const a="popup=1,height=780,width=427,top="+Math.max((window.screen.height-780)/2,20)+",left="+i;
-        this._win = window.open([this.base, this.account.create].join("/"),"account_popup_win_"+Date.now(),a);
+        const i = Math.max((window.screen.width - 427) / 2, 20);
+        const a = "popup=1,height=780,width=427,top=" + Math.max((window.screen.height - 780) / 2, 20) + ",left=" + i;
+        this._win = window.open([this.base, this.account.create].join("/"), "account_popup_win_" + Date.now(), a);
+    }
+
+    accountOpenBackup() {
+        const i = Math.max((window.screen.width - 427) / 2, 20);
+        const a = "popup=1,height=780,width=427,top=" + Math.max((window.screen.height - 780) / 2, 20) + ",left=" + i;
+        this._win = window.open([this.base, "home/backup"].join("/"), "account_popup_win_" + Date.now(), a);
     }
 
     accountBackup(pre?: string) {
@@ -156,7 +169,7 @@ class Url {
         // if (process.env.NODE_ENV == "development"){
         //     walletWorker.unlockWallet("12345678")
         // }else{
-            this.goTo([this.base, this.account.unlock].join("/"), "");
+        this.goTo([this.base, this.account.unlock].join("/"), "");
         // }
     }
 }

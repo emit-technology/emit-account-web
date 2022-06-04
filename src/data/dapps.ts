@@ -15,7 +15,9 @@ class Dapps {
     }
 
     get = (host:string) =>{
-        return selfStorage.getItem(this._key(host));
+        const _key = this._key(host);
+        const rest = selfStorage.getItem(_key);
+        return rest;
     }
 
     remove = (host:string) =>{
@@ -30,7 +32,7 @@ class Dapps {
     }
 
     _key = (k:string)=>{
-        return `${PREFIX}${k}`
+        return `${PREFIX}${k.replace(":","_")}`
     }
 }
 

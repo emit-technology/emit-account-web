@@ -11,7 +11,7 @@ import {
 import Avatar from "react-avatar";
 import "./index.css";
 import {IConfig} from "@emit-technology/emit-account-node-sdk";
-import {AccountModel} from "../../types";
+import {AccountModel, ChainType} from "@emit-technology/emit-types";
 import {getParentUrl} from "../../common/utils";
 
 interface Props {
@@ -22,9 +22,9 @@ interface Props {
 
     router: HTMLIonRouterOutletElement | null;
 
-    msg?: any
-    config?: IConfig
-    account?:AccountModel
+    msg: any
+    config: IConfig
+    account:AccountModel
 }
 
 export const SignMessageWidget: React.FC<Props> = ({
@@ -37,7 +37,6 @@ export const SignMessageWidget: React.FC<Props> = ({
                                                    }) => {
     const refer = getParentUrl();
 
-    console.log(refer,showModal,"showmodal:")
     return (
         <>
             {/* Card Modal */}
@@ -105,29 +104,12 @@ export const SignMessageWidget: React.FC<Props> = ({
                                 padding: "0px 24px 6px",
                                 color: "#4d4d4d"
                             }}>
-                                Signing <IonChip color="primary" outline>{msg["messageStandard"]}</IonChip>
+                                Signing Message
                             </div>
-                            <div style={{margin: "12px",maxHeight:'200px',overflowY:"scroll"}}>
-                                <IonItemDivider>From</IonItemDivider>
-                                <IonItem>
-                                    <IonLabel className="ion-text-wrap">
-                                        <div style={{fontSize: "16px", color: "#4d4d4d", wordBreak: "break-all"}}>
-                                            <pre>
-                                                {msg["from"]}
+                            <div  className="pre-data">
+                                <pre>
+                                                {JSON.stringify(msg,undefined,2)}
                                             </pre>
-                                        </div>
-                                    </IonLabel>
-                                </IonItem>
-                                <IonItemDivider>Data</IonItemDivider>
-                                <IonItem>
-                                    <IonLabel className="ion-text-wrap">
-                                        <div style={{fontSize: "16px", color: "#4d4d4d", wordBreak: "break-all"}}>
-                                            <pre>
-                                                {msg["data"]}
-                                            </pre>
-                                        </div>
-                                    </IonLabel>
-                                </IonItem>
                             </div>
                             <div className="btn-bottom">
                                 <IonRow>

@@ -31,7 +31,7 @@ import {
 import './style.css';
 import {chevronBack, closeCircle} from 'ionicons/icons'
 import walletWorker from "../worker/walletWorker";
-import {AccountModel} from "emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-types";
 import selfStorage from "../common/storage";
 import url from "../common/url";
 import i18n from "../locales/i18n";
@@ -78,24 +78,26 @@ class Confirm extends React.Component<any, State> {
 
     confirm = () => {
         const tmpMnemonic: any =  config.TMP.MNEMONIC; //sessionStorage.getItem("tmpMnemonic")
-        const tmpAccount: any = sessionStorage.getItem("tmpAccount")
-        if(tmpAccount){
-            const account: AccountModel = JSON.parse(tmpAccount);
+        const account: any = config.TMP.Account;//sessionStorage.getItem("tmpAccount")
+        if(account && account.name){
             this.setState({
                 showProgress:true,
                 showButton:false
             })
             walletWorker.importMnemonic(tmpMnemonic, account.name, account.password ? account.password : "", account.hint ? account.hint : "", "").then(((accountId:any) => {
                 if(accountId){
-                    sessionStorage.removeItem("tmpMnemonic");
-                    config.TMP.MNEMONIC = ""
-                    sessionStorage.removeItem("tmpAccount");
-                    selfStorage.setItem("accountId",accountId)
-                    // window.location.href = "/#/"
-                    // window.location.reload();
-                    selfStorage.setItem("viewedSlide",true);
-                    url.home();
-                    window.location.reload();
+                    walletWorker.setBackedUp(accountId).then(()=>{
+                        sessionStorage.removeItem("tmpMnemonic");
+                        config.TMP.MNEMONIC = ""
+                        config.TMP.Account = {}
+                        sessionStorage.removeItem("tmpAccount");
+                        selfStorage.setItem("accountId",accountId)
+                        // window.location.href = "/#/"
+                        // window.location.reload();
+                        selfStorage.setItem("viewedSlide",true);
+                        url.home();
+                        // window.location.reload();
+                    })
                 }
             })).catch(()=>{
                 this.setState({
@@ -103,9 +105,12 @@ class Confirm extends React.Component<any, State> {
                 })
             })
         }else{
-            sessionStorage.removeItem("tmpMnemonic");
-            config.TMP.MNEMONIC = ""
-            url.goTo(url.path_settings(),"")
+            const accountId = selfStorage.getItem("accountId");
+            walletWorker.setBackedUp(accountId).then(()=>{
+                sessionStorage.removeItem("tmpMnemonic");
+                config.TMP.MNEMONIC = "";
+                url.home();
+            }).catch(e=>console.error(e))
         }
     }
 

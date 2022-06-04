@@ -17,8 +17,8 @@ import {
 import Avatar from "react-avatar";
 import "./index.css";
 import {IConfig} from "@emit-technology/emit-account-node-sdk";
+import {AccountModel, ChainType} from "@emit-technology/emit-types";
 import {getParentUrl, utils} from "../../common/utils";
-import {AccountModel} from "../../types";
 
 interface Props {
     showModal?: boolean;
@@ -52,7 +52,13 @@ export const ApproveWidget: React.FC<Props> = ({
                 <IonPage>
                     <IonHeader>
                         <IonToolbar color="white">
-                            <IonTitle>EMIT Notification</IonTitle>
+                            <IonTitle>
+                                EMIT Notification
+                                {/*<div className="powered-by">*/}
+                                {/*    <img src="./assets/icon/icon.png"/>*/}
+                                {/*    <small>powered by emit</small>*/}
+                                {/*</div>*/}
+                            </IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
                                 onCancel()
                             }}/>
@@ -66,7 +72,7 @@ export const ApproveWidget: React.FC<Props> = ({
                                     <IonLabel className="ion-text-wrap">
                                         <div className="text-primary"><IonText color="dark">{host}</IonText></div>
                                         <div>
-                                            <IonChip outline color="medium">{config.dapp.name}</IonChip>
+                                            <IonChip outline color="medium">{config &&config.dapp && config.dapp.name}</IonChip>
                                         </div>
                                     </IonLabel>
                                 </IonItem>
@@ -80,7 +86,7 @@ export const ApproveWidget: React.FC<Props> = ({
                             <div style={{minHeight: "100px", overflowY: "scroll"}}>
                                 <div style={{padding: "12px 0", borderBottom: "1px solid #ddd"}}>
                                     {
-                                        account && account.addresses && <IonItem lines="none" color="warning">
+                                        account && account.addresses && config && config.network && <IonItem lines="none" color="warning">
                                             <IonAvatar slot="start">
                                                 <Avatar name={account.name} round size="45"/>
                                             </IonAvatar>

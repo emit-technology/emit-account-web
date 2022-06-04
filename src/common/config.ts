@@ -23,6 +23,7 @@ export const config = {
         }
     },
     TMP: {
-        MNEMONIC: ""
+        MNEMONIC: "",
+        Account: {}
     }
 }

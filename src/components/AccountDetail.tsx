@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {AccountModel, ChainType} from "emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-types";
 import {IonChip, IonRow, IonCol, IonButton, IonText, useIonToast} from '@ionic/react'
 import {config} from "../common/config";
 import copy from 'copy-to-clipboard';
@@ -50,11 +50,6 @@ export const AccountDetail :React.FC<Props> = ({account,onClose,showChainId})=>{
                        const url = config.EXPLORER.ADDRESS[ChainType[showChainId]]+account.addresses[showChainId];
                        window.open(url,"_blank")
                     }}>View Detail in Explorer</IonButton>
-                </IonCol>
-            </IonRow>
-            <IonRow>
-                <IonCol>
-                    <IonButton expand="block" fill="outline">Export Private Key</IonButton>
                 </IonCol>
             </IonRow>
         </div>

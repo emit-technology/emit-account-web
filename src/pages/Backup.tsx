@@ -24,46 +24,75 @@ import {
     IonTitle,
     IonToolbar,
     IonList,
-    IonItem,IonText, IonButton, IonGrid, IonRow, IonCol, IonIcon
+    IonItem, IonText, IonButton, IonGrid, IonRow, IonCol, IonIcon, IonProgressBar
 } from "@ionic/react";
 import './style.css';
 import url from "../common/url";
 import {chevronBack} from "ionicons/icons";
 import i18n from "../locales/i18n"
 import {config} from "../common/config";
+import walletWorker from "../worker/walletWorker";
+import selfStorage from "../common/storage";
+import {AccountModel, ChainType} from "@emit-technology/emit-types";
 
 interface State {
-    mnemonic: Array<string>;
+    // mnemonic: Array<string>;
+    showProgress: boolean
 }
 
 class Backup extends React.Component<any, State> {
 
     state: State = {
-        mnemonic: [],
+        // mnemonic: [],
+        showProgress: false
     }
 
     componentDidMount() {
-        const tmpMnemonic:any = config.TMP.MNEMONIC;
-        if(!tmpMnemonic){
+        const tmpMnemonic: any = config.TMP.MNEMONIC;
+        if (!tmpMnemonic) {
             // window.location.href = "/#/account/create";
             url.accountCreate();
             return
         }
-        this.setState({
-            mnemonic:tmpMnemonic.split(" ")
-        })
+        // this.setState({
+        //     mnemonic: tmpMnemonic.split(" ")
+        // })
+    }
+
+    create = async () => {
+        const account: AccountModel = config.TMP.Account; //sessionStorage.getItem("tmpAccount")
+        if (account) {
+            const accountId = await walletWorker.importMnemonic(config.TMP.MNEMONIC, account.name, account.password ? account.password : "", account.passwordHint, "");
+            if(accountId){
+                sessionStorage.removeItem("tmpMnemonic");
+                config.TMP.MNEMONIC = ""
+                config.TMP.Account = {}
+                sessionStorage.removeItem("tmpAccount");
+                selfStorage.setItem("accountId", accountId)
+                // window.location.href = "/#/"
+                // window.location.reload();
+                selfStorage.setItem("viewedSlide", true);
+                url.home();
+            }
+            // window.location.reload();
+        }
     }
 
     render() {
-        const {mnemonic} = this.state;
+        const {showProgress} = this.state;
+        let mnemonic = config.TMP.MNEMONIC.split(" ");
         return <>
             <IonPage>
                 <IonContent fullscreen>
                     <IonHeader>
                         <IonToolbar mode="ios" color="primary">
-                            <IonIcon src={chevronBack} slot="start" size="large" onClick={()=>{url.back()}}/>
+                            <IonIcon src={chevronBack} slot="start" size="large" onClick={() => {
+                                config.TMP.MNEMONIC = ""
+                                url.back()
+                            }}/>
                             <IonTitle>{i18n.t("backupMnemonic")}</IonTitle>
                         </IonToolbar>
+                        {showProgress && <IonProgressBar type="indeterminate"/>}
                     </IonHeader>
                     <IonList>
                         <IonItem lines="none">
@@ -144,10 +173,38 @@ class Backup extends React.Component<any, State> {
 
                     </IonList>
                     <div className="button-bottom">
-                        <IonButton mode="ios" expand="block" onClick={()=>{
-                            // window.location.href = "/#/account/confirm"
-                            url.accountConfirm();
-                        }}> {i18n.t("confirmBackup")}</IonButton>
+                        <IonRow>
+                            <IonCol size="5">
+                                <IonButton disabled={showProgress} mode="ios" fill="outline" expand="block"
+                                           onClick={() => {
+                                               if(config.TMP.Account["name"]){
+                                                   this.setState({
+                                                       showProgress: true,
+                                                   })
+                                                   this.create().then(() => {
+                                                       this.setState({
+                                                           showProgress: false,
+                                                       })
+                                                   }).catch(e => {
+                                                       console.error(e)
+                                                       const err = typeof e == 'string' ? e : e.message;
+                                                       this.setState({
+                                                           showProgress: false,
+                                                       })
+                                                   })
+                                               }else{
+                                                   config.TMP.MNEMONIC = "" ;
+                                                   url.back();
+                                               }
+                                           }}> Later Backup</IonButton>
+                            </IonCol>
+                            <IonCol size="7">
+                                <IonButton disabled={showProgress} mode="ios" expand="block" onClick={() => {
+                                    // window.location.href = "/#/account/confirm"
+                                    url.accountConfirm();
+                                }}> {i18n.t("confirmBackup")}</IonButton>
+                            </IonCol>
+                        </IonRow>
                     </div>
                 </IonContent>
             </IonPage>

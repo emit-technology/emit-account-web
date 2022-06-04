@@ -1,6 +1,6 @@
 {
   "name": "emit-core-account",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "homepage": "./",
   "dependencies": {
@@ -12,6 +12,7 @@
     "@capacitor/status-bar": "1.0.8",
     "@emit-technology/emit-account-node-sdk": "file:../emit-account-node-sdk",
     "@emit-technology/emit-lib": "file:../emit-lib",
+    "@emit-technology/emit-types": "file:../emit-types",
     "@ionic/react": "^6.0.0",
     "@ionic/react-router": "^6.0.0",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
@@ -38,7 +39,6 @@
     "css-loader": "4.3.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
-    "emit-types": "file:../emit-types",
     "eslint": "^7.11.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-flowtype": "^5.2.0",
@@ -135,8 +135,13 @@
     "@capacitor/cli": "3.4.1",
     "axios": "^0.26.1",
     "babel-plugin-transform-bigint": "^1.0.12",
+    "bignumber.js": "^9.0.2",
+    "buffer": "^6.0.3",
     "copy-to-clipboard": "^3.3.1",
+    "date-format": "^4.0.10",
     "penpal": "^6.2.2",
+    "safe-buffer": "^5.2.1",
+    "web3-core": "^1.7.3",
     "web3-utils": "^1.7.3"
   },
   "description": "An Ionic project",
