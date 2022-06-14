@@ -25,5 +25,6 @@ export const config = {
     TMP: {
         MNEMONIC: "",
         Account: {}
-    }
+    },
+    ACCOUNT_NODE: "https://node-account.emit.technology"
 }

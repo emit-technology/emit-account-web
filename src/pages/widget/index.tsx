@@ -1,7 +1,6 @@
 export * from './SignMessageWidget'
 export * from './SignTxWidgetWeb3'
 export * from './ApproveWidget'
-export * from './AccountList'
 export * from './BackupModal'
 export * from './SignTxWidgetEmit'
 export * from './UnlockModal'

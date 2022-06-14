@@ -1,8 +1,8 @@
 .common-modal{
     --height: 60vh;
     --width: 90vw;
-    --max-width: 512px;
     --border-radius: 25px;
+    --max-width: 450px;
 }
 
 .account-list{

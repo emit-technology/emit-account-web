@@ -1,6 +1,7 @@
 import {Category} from "@emit-technology/emit-account-node-sdk";
-import {ChainType} from "@emit-technology/emit-types";
+import {ChainType} from "@emit-technology/emit-lib";
 import BigNumber from "bignumber.js";
+
 const BN = require('bn.js');
 const format = require('date-format');
 export const utils = {
@@ -84,8 +85,8 @@ export const utils = {
     },
 
     formatCategoryString: (category: Category): string => {
-        const name = utils.fromHex(category.name);
-        if ( category.name === "0000000000000000000000000000000000000000000000000000000000000000" ) {
+        const name = utils.fromHex(category.supplier);
+        if ( category.symbol === "0000000000000000000000000000000000000000000000000000000000000000" ) {
             return "EASTER";
         }
         return name;
@@ -107,6 +108,24 @@ export const utils = {
             10 ** decimal
         );
     },
+
+
+    isSafari : ():boolean =>{
+        return ((/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)))
+    },
+
+    defaultFeeCy: (chain:ChainType):string =>{
+        if(chain == ChainType.ETH){
+            return "ETH"
+        }else if(chain == ChainType.BSC){
+            return "BNB"
+        }else if(chain == ChainType.SERO){
+            return "SERO"
+        }else if(chain == ChainType.TRON){
+            return "TRX"
+        }
+        return ""
+    }
 }
 
 export function getParentUrl() {

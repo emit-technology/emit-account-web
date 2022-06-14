@@ -12,19 +12,22 @@ body {
     /*height: 100% !important;*/
 }
 
-.accounts-popover {
-    --height: 90vh;
-    --width: 80vw;
-    --max-width: 300px;
-    --background: #000;
-}
+/*.accounts-popover {*/
+/*    --height: 90vh;*/
+/*    --width: 80vw;*/
+/*    --max-width: 300px;*/
+/*    --background: #000;*/
+/*}*/
 
+.modal-common{
+    --max-width: 512px;
+}
 
 @media (min-width: 769px) {
     .page {
         position: absolute;
         width: 768px;
-        height: 1024px;
+        height: 90vh;
         transform: translate(-50%, -50%);
         left: 50%;
         top: 50%;
@@ -36,11 +39,11 @@ body {
         height: 100%;
     }
 
-    .accounts-popover {
-        --offset-x: - calc(50vw - 384px);
-        --offset-y: calc(50vh - 667px);
-        --max-width: 360px !important;
-    }
+    /*.accounts-popover {*/
+    /*    --offset-x: - calc(50vw - 368px);*/
+    /*    --offset-y: calc(50vh - 567px);*/
+    /*    --max-width: 360px !important;*/
+    /*}*/
     .pre-data{
         max-height: 180px !important;
     }

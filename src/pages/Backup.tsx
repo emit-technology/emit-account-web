@@ -33,7 +33,7 @@ import i18n from "../locales/i18n"
 import {config} from "../common/config";
 import walletWorker from "../worker/walletWorker";
 import selfStorage from "../common/storage";
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 
 interface State {
     // mnemonic: Array<string>;
@@ -84,8 +84,8 @@ class Backup extends React.Component<any, State> {
         return <>
             <IonPage>
                 <IonContent fullscreen>
-                    <IonHeader>
-                        <IonToolbar mode="ios" color="primary">
+                    <IonHeader  collapse="fade">
+                        <IonToolbar mode="ios">
                             <IonIcon src={chevronBack} slot="start" size="large" onClick={() => {
                                 config.TMP.MNEMONIC = ""
                                 url.back()

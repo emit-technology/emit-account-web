@@ -1,18 +1,12 @@
 import * as React from 'react';
 
 import './ExploreContainer.css';
-import {
-  IonItem,
-  IonAvatar,
-  IonLabel,
-  IonList,
-  IonText,
-  IonIcon, IonPopover, IonListHeader
-} from '@ionic/react'
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
-import {ellipseSharp, ellipsisVertical, openOutline, qrCode, qrCodeSharp, radioButtonOnOutline} from "ionicons/icons";
+import {IonAvatar, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonText} from '@ionic/react'
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
+import {addCircleOutline, personAddOutline, qrCode} from "ionicons/icons";
 import {config} from "../common/config";
 import {utils} from "../common/utils";
+import url from "../common/url";
 
 interface ContainerProps {
   account?:AccountModel
@@ -22,6 +16,7 @@ interface ContainerProps {
 }
 
 const AccountContainer: React.FC<ContainerProps> = ({account,showAccessedWebsite,showAccountDetail,viewAccountInExplorer}) => {
+  const sortAddress = [ChainType.EMIT,ChainType.ETH,ChainType.BSC];
   return (
     <>
       <IonList>
@@ -29,8 +24,7 @@ const AccountContainer: React.FC<ContainerProps> = ({account,showAccessedWebsite
           <IonLabel><IonText color="medium">Hello, </IonText>{account.name} </IonLabel>
         </IonListHeader>
         {
-            account && account.addresses && Object.keys(account.addresses).map((v,i) => {
-              const chainId = parseInt(v)
+            account && account.addresses && sortAddress.map((chainId,i) => {
                 return <IonItem key={i} onClick={(e)=>{
                   e.persist()
                   showAccountDetail(chainId)
@@ -41,7 +35,7 @@ const AccountContainer: React.FC<ContainerProps> = ({account,showAccessedWebsite
                     <IonLabel className="ion-text-wrap">
                      <div>
                        <h1><IonText color={"dark"}>{config.CHAIN_DESCRIPTION[ChainType[chainId]]}</IonText></h1>
-                       <IonText color="medium">{utils.ellipsisStr(account.addresses[v],10)}</IonText>
+                       <IonText color="medium">{utils.ellipsisStr(account.addresses[chainId],10)}</IonText>
                      </div>
                     </IonLabel>
                   {

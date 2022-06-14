@@ -1,8 +1,9 @@
 import * as React from 'react';
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
-import {IonChip, IonRow, IonCol, IonButton, IonText, useIonToast} from '@ionic/react'
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
+import {IonButton, IonChip, IonCol, IonIcon, IonRow, IonText, useIonToast} from '@ionic/react'
 import {config} from "../common/config";
 import copy from 'copy-to-clipboard';
+import {copyOutline} from "ionicons/icons";
 
 const QRCode = require('qrcode.react');
 
@@ -10,9 +11,10 @@ interface Props{
     account:AccountModel
     showChainId:ChainType;
     onClose:()=>void;
+    onBackup:()=>void;
 }
 
-export const AccountDetail :React.FC<Props> = ({account,onClose,showChainId})=>{
+export const AccountDetail :React.FC<Props> = ({account,onClose,onBackup,showChainId})=>{
     const [present, dismiss] = useIonToast();
 
     return <div className="account-box">
@@ -40,16 +42,26 @@ export const AccountDetail :React.FC<Props> = ({account,onClose,showChainId})=>{
                         onWillDismiss: () => console.log('will dismiss'),
                     }).catch(e=>console.error(e))
 
-                }}>{account.addresses[showChainId]}</IonChip>
+                }}>{account.addresses[showChainId]} <IonIcon src={copyOutline} color="medium" /></IonChip>
             </div>
         </div>
         <div>
+            {
+                showChainId != ChainType.EMIT && <IonRow>
+                    <IonCol>
+                        <IonButton expand="block" fill="outline" onClick={()=>{
+                            const url = config.EXPLORER.ADDRESS[ChainType[showChainId]]+account.addresses[showChainId];
+                            window.open(url,"_blank")
+                        }}>View Detail in Explorer</IonButton>
+
+                    </IonCol>
+                </IonRow>
+            }
             <IonRow>
                 <IonCol>
                     <IonButton expand="block" fill="outline" onClick={()=>{
-                       const url = config.EXPLORER.ADDRESS[ChainType[showChainId]]+account.addresses[showChainId];
-                       window.open(url,"_blank")
-                    }}>View Detail in Explorer</IonButton>
+                      onBackup()
+                    }}>Backup account</IonButton>
                 </IonCol>
             </IonRow>
         </div>

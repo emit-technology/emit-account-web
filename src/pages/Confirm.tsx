@@ -31,7 +31,7 @@ import {
 import './style.css';
 import {chevronBack, closeCircle} from 'ionicons/icons'
 import walletWorker from "../worker/walletWorker";
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import selfStorage from "../common/storage";
 import url from "../common/url";
 import i18n from "../locales/i18n";
@@ -152,8 +152,8 @@ class Confirm extends React.Component<any, State> {
         return <>
             <IonPage>
                 <IonContent fullscreen>
-                    <IonHeader>
-                        <IonToolbar mode="ios" color="primary">
+                    <IonHeader  collapse="fade">
+                        <IonToolbar mode="ios">
                             <IonIcon src={chevronBack} slot="start" size="large" onClick={()=>{url.back()}}/>
                             <IonTitle><IonText>{i18n.t("confirm")}</IonText></IonTitle>
                         </IonToolbar>

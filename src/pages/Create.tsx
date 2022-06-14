@@ -30,7 +30,7 @@ import {
 } from "@ionic/react";
 import './style.css';
 import walletWorker from "../worker/walletWorker";
-import {AccountModel} from "@emit-technology/emit-types";
+import {AccountModel} from "@emit-technology/emit-lib";
 import url from "../common/url";
 import i18n from "../locales/i18n";
 import {chevronBack} from "ionicons/icons";
@@ -109,8 +109,8 @@ class CreateAccount extends React.Component<any, State> {
         return <>
             <IonPage>
                 <IonContent fullscreen>
-                    <IonHeader>
-                        <IonToolbar mode="ios" color="primary">
+                    <IonHeader  collapse="fade">
+                        <IonToolbar mode="ios">
                             {
                                 accountId &&
                                 <IonIcon src={chevronBack} slot="start" size="large" onClick={() => {
@@ -120,9 +120,7 @@ class CreateAccount extends React.Component<any, State> {
                             <IonTitle>
                                 <IonText>{i18n.t("create")} {i18n.t("wallet")}</IonText>
                             </IonTitle>
-                            {/*<IonIcon slot="end" src={downloadOutline} color="primary" size="large"/>*/}
-                            <IonButton fill="outline" color="warning" size="small" slot="end" onClick={() => {
-                                // window.location.href="/#/account/import"
+                            <IonButton fill="outline" size="small" slot="end" onClick={() => {
                                 url.accountImport();
                             }}>{i18n.t("import")}</IonButton>
                         </IonToolbar>

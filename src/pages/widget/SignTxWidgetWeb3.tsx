@@ -22,9 +22,11 @@ import {arrowForwardCircleOutline, close, linkOutline,} from "ionicons/icons";
 import Avatar from "react-avatar";
 import "./index.css";
 import {IConfig} from "@emit-technology/emit-account-node-sdk";
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import {getParentUrl, utils} from "../../common/utils";
 import {Transaction} from "web3-core";
+import {GasPriceActionSheet} from "../../components/GasPriceActionSheet";
+import {getGasLevel} from "../../rpc";
 
 interface Props {
     showModal?: boolean;
@@ -35,7 +37,7 @@ interface Props {
 
     transaction: Transaction;
     config: IConfig;
-    account: AccountModel
+    account: AccountModel;
 }
 
 export const SignTxWidgetWeb3: React.FC<Props> = ({
@@ -49,6 +51,9 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                                   router,
                                               }) => {
     const [segment,setSegment] = React.useState("info");
+    const [showGasPriceModal,setShowGasPriceModal] = React.useState(false);
+
+    const [gasLevel,setGasLevel] = React.useState({});
     return (
         <>
             {/* Card Modal */}
@@ -60,7 +65,7 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
             >
 
                 <IonPage>
-                    <IonHeader>
+                    <IonHeader  collapse="fade">
                         <IonToolbar color="white">
                             <IonTitle>Sign Transaction</IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
@@ -116,12 +121,11 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                 padding: "12px 36px 24px",
                                 color: "#4d4d4d"
                             }}>
-                                {utils.fromValue(transaction.value,18).toString(10)} BNB
+                                {utils.fromValue(transaction.value,18).toString(10)} {utils.defaultFeeCy(config.network.chainType.valueOf())}
                             </div>
                             <div>
                                 <IonSegment mode="md" value={segment}
                                             onIonChange={e => {
-                                                console.log('Segment selected', e.detail.value);
                                                 setSegment(e.detail.value)
                                             }}>
                                     <IonSegmentButton value="info">
@@ -144,16 +148,23 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                     <IonItem>
                                         <IonLabel>Estimated Gas</IonLabel>
                                         <IonLabel className="ion-text-wrap">
-                                            <div className="ion-text-right"><IonText color="primary">Edit</IonText></div>
+                                            <div className="ion-text-right" onClick={()=>{
+                                                getGasLevel(config.network.chainType.valueOf()).then(rest=>{
+                                                    if(rest){
+                                                        setGasLevel(rest);
+                                                        setShowGasPriceModal(true);
+                                                    }
+                                                })
+                                            }}><IonText color="secondary">Edit</IonText></div>
                                             <div className="text-secondary ion-text-right">{utils.fromValue(transaction.gas,0).toString(10)} * {utils.fromValue(transaction.gasPrice,9).toString(10)} GWei</div>
-                                            <div className="text-primary ion-text-right">{utils.fromValue(transaction.gas,0).multipliedBy(utils.fromValue(transaction.gasPrice,18)).toString(10)}BNB</div>
+                                            <div className="text-primary ion-text-right">{utils.fromValue(transaction.gas,0).multipliedBy(utils.fromValue(transaction.gasPrice,18)).toString(10)} {utils.defaultFeeCy(config.network.chainType.valueOf())}</div>
                                         </IonLabel>
                                     </IonItem>
                                     <IonItem>
                                         <IonLabel>Total</IonLabel>
                                         <IonLabel className="ion-text-wrap">
                                             {/*<div className="text-secondary ion-text-right">11</div>*/}
-                                            <div className="text-primary ion-text-right">{utils.fromValue(transaction.value,18).plus(utils.fromValue(transaction.gas,0).multipliedBy(utils.fromValue(transaction.gasPrice,18))).toString(10)} BNB</div>
+                                            <div className="text-primary ion-text-right">{utils.fromValue(transaction.value,18).plus(utils.fromValue(transaction.gas,0).multipliedBy(utils.fromValue(transaction.gasPrice,18))).toString(10)}  {utils.defaultFeeCy(config.network.chainType.valueOf())}</div>
                                         </IonLabel>
                                     </IonItem>
                                 </div>
@@ -181,6 +192,15 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                 </IonRow>
                             </div>
                         </div>
+
+                        {
+                            gasLevel && <GasPriceActionSheet onClose={()=>{
+                                setShowGasPriceModal(false)
+                            }} onSelect={(gasPrice)=>{
+                                transaction.gasPrice = utils.toHex(utils.toValue(gasPrice,9))
+                                setShowGasPriceModal(false);
+                            }} isOpen={showGasPriceModal} chain={config.network.chainType} gasLimit={utils.toHex(transaction.gas)} gasLevel={gasLevel}/>
+                        }
 
                     </IonContent>
                 </IonPage>

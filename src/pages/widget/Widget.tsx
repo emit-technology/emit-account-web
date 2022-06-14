@@ -1,7 +1,7 @@
 import * as React from "react";
 import {connectToParent} from "penpal";
 import {IConfig, IPayload, SignWrapped} from "@emit-technology/emit-account-node-sdk";
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import {getParentUrl, utils} from "../../common/utils";
 import * as web3Utils from "web3-utils";
 import walletWorker from "../../worker/walletWorker";
@@ -15,8 +15,11 @@ import {SignMessageWidget} from "./SignMessageWidget";
 import {ApproveWidget} from "./ApproveWidget";
 import {UnlockModal} from "./UnlockModal";
 import {IonToast} from "@ionic/react";
-import {AccountListModal} from "./AccountList";
+import {AccountListModal} from "../../components/AccountListModal";
 import {BackupModal} from "./BackupModal";
+import {GasPriceActionSheet} from "../../components/GasPriceActionSheet";
+import BigNumber from "bignumber.js";
+import {config} from "../../common/config";
 
 interface Props {
     router: HTMLIonRouterOutletElement | null;
@@ -42,6 +45,12 @@ interface State {
     msg?: any,
     tx?: any
     opCode: Operation
+
+    showGasTrackerModal: boolean;
+    gasChain: ChainType,
+    gasPrice: string
+    gasLimitHex:string
+    gasLevel?: any
 }
 
 const BOX_HEIGHT = '100%';
@@ -69,6 +78,11 @@ export class WidgetPage extends React.Component<Props, State> {
 
         opCode: Operation._,
         refer: "",
+
+        showGasTrackerModal: false,
+        gasChain: ChainType.ETH,
+        gasPrice: "5",
+        gasLimitHex: new BigNumber(25000).toString(16)
     }
 
     componentDidMount() {
@@ -131,6 +145,7 @@ export class WidgetPage extends React.Component<Props, State> {
                 setConfig: this.setConfig,
                 batchSignMessage: this.batchSignMsg,
                 requestAccount: this.requestAccount,
+                calcGasPrice: this.calcGasPrice,
             },
         });
 
@@ -184,8 +199,32 @@ export class WidgetPage extends React.Component<Props, State> {
         if (config) {
             this.setState({config: config})
         }
+        await this.checkStorageAccess();
         await this.checkAccountExist();
         await this.checkIsLocked();
+    }
+
+    private checkStorageAccess = async ()=>{
+        return new Promise((resolve, reject) => {
+            //@ts-ignore
+            if(document && document.hasStorageAcces && document.requestStorageAccess){
+                document.hasStorageAccess().then(hasAccess => {
+                    if (hasAccess) {
+                        resolve(true)
+                        // storage access has been granted already.
+                    } else {
+                        document.requestStorageAccess().then(
+                            ()=> resolve(true),
+                            ()=> reject("User reject storage access!")
+                        )
+                        // storage access hasn't been granted already;
+                        // you may want to call requestStorageAccess().
+                    }
+                });
+            }else{
+                resolve(true)
+            }
+        })
     }
 
     requestAccount = async (config: IConfig): Promise<{ error: string; result: AccountModel }> => {
@@ -207,6 +246,43 @@ export class WidgetPage extends React.Component<Props, State> {
         }
 
         return {error: err, result: ret}
+    }
+
+    calcGasPrice = async (gasLimitHex:string, gasChain:ChainType,config: IConfig): Promise<{ error: string; result: string }> => {
+        let err = null;
+        let ret:string = null;
+        console.log("calc gas price",gasLimitHex)
+        try {
+            await this._showWidget()
+            await this.checkWalletStates(config);
+            const gasLevel = await this.getGasLevel(gasChain);
+            this.setState({showGasTrackerModal: true,gasLimitHex: gasLimitHex, gasChain:gasChain,gasLevel: gasLevel});
+            await this.waitOperation("showGasTrackerModal");
+            await this.checkApprove()
+            ret = this.state.gasPrice;
+            // ret = await walletWorker.accountInfoAsync();
+        } catch (e) {
+            err = typeof e == 'string' ? e : e.message;
+        } finally {
+            await this._hideWidget()
+        }
+        return {error: err, result: ret}
+    }
+
+    getGasLevel = async (chain:ChainType)=>{
+        if(chain == ChainType.ETH){
+            return await jsonRpc(config.ACCOUNT_NODE,{id:0,method:"eth_gasTracker",params:[],jsonrpc:"2.0"})
+        }else if(chain == ChainType.BSC){
+            const gasPrice = await jsonRpc(config.ACCOUNT_NODE,{id:0,method:"eth_gasPrice",params:[],jsonrpc:"2.0"},chain)
+            return {
+                AvgGasPrice: {gasPrice: gasPrice, second: 5}
+            }
+        }else if(chain == ChainType.SERO){
+            const gasPrice = await jsonRpc(config.ACCOUNT_NODE,{id:0,method:"sero_gasPrice",params:[],jsonrpc:"2.0"},chain)
+            return {
+                AvgGasPrice: {gasPrice: gasPrice, second: 5}
+            }
+        }
     }
 
     initAccount = async () => {
@@ -267,7 +343,9 @@ export class WidgetPage extends React.Component<Props, State> {
             if(!account["backedUp"]){
                 this.setShowBackupModal(true)
                 await this.waitOperation("showBackupModal")
-                url.accountOpenBackup();
+                if(url.accountOpenBackup()){
+                    return Promise.reject("The popup window has been blocked.")
+                }
                 await this.waitAccountBackup()
             }
             return Promise.resolve(true);
@@ -329,7 +407,9 @@ export class WidgetPage extends React.Component<Props, State> {
     checkAccountExist = async (): Promise<boolean> => {
         const accountId = selfStorage.getItem("accountId");
         if (!accountId) {
-            url.accountOpenCreate();
+            if(!url.accountOpenCreate()){
+               return Promise.reject("The popup window has been blocked.")
+            }
             await this.waitAccountCreate();
         }
         return Promise.resolve(true);
@@ -387,7 +467,7 @@ export class WidgetPage extends React.Component<Props, State> {
 
     signTransaction = async (txParams: any, config: IConfig): Promise<{ error: string, result: string }> => {
         let chainParams, err = null, ret = null;
-        if (utils.isWeb3Chain(config.network.chainType)) {
+        if (utils.isWeb3Chain(config.network.chainType.valueOf())) {
             if (!txParams.nonce) {
                 return {error: "tx nonce is required! ", result: ""}
             }
@@ -395,7 +475,7 @@ export class WidgetPage extends React.Component<Props, State> {
                 return {error: "from address is required! ", result: ""}
             }
             chainParams = txParams.common;
-            if (!txParams.common && (config.network.chainType == ChainType.ETH || config.network.chainType == ChainType.BSC)) {
+            if (!txParams.common) {
                 chainParams = {
                     baseChain: "mainnet",
                     customer: {name: "mainnet", networkId: 1, chainId: 1,},
@@ -412,7 +492,7 @@ export class WidgetPage extends React.Component<Props, State> {
             await this.waitOperation("showTransactionModal");
             const {account} = this.state;
             ret = await walletWorker.signTx(account.accountId, "", config.network.chainType, txParams, chainParams)
-            if(config.network.chainType == ChainType.BSC || config.network.chainType == ChainType.ETH){
+            if(utils.isWeb3Chain(config.network.chainType.valueOf())){
                 ret = "0x"+web3Utils.stripHexPrefix(ret)
             }
         } catch (e) {
@@ -536,7 +616,8 @@ export class WidgetPage extends React.Component<Props, State> {
     render() {
         const {
             account, showTransactionModal, showToast, toastMessage, config, msg, showAccountsModal
-            , showUnlockModal, tx, showApproveModal, showSignMessageModal, accounts,showBackupModal
+            , showUnlockModal, tx, showApproveModal, showSignMessageModal, accounts,showBackupModal,
+            gasChain,showGasTrackerModal,gasLimitHex,gasLevel
         } = this.state;
         return (
             <div>
@@ -684,6 +765,21 @@ export class WidgetPage extends React.Component<Props, State> {
                     message={toastMessage}
                     duration={2000}
                 />
+
+                {
+                    gasLevel && <GasPriceActionSheet gasLimit={gasLimitHex} gasLevel={gasLevel} onClose={()=>{
+                        this.setState({
+                            showGasTrackerModal:false,
+                            opCode: Operation.cancel
+                        })
+                    }} onSelect={(gasPrice)=>{
+                        this.setState({
+                            showGasTrackerModal:false,
+                            opCode: Operation.confirm,
+                            gasPrice: gasPrice
+                        })
+                    }} isOpen={showGasTrackerModal} chain={gasChain} />
+                }
             </div>
         );
     }

@@ -17,7 +17,7 @@ import {
 import Avatar from "react-avatar";
 import "./index.css";
 import {IConfig} from "@emit-technology/emit-account-node-sdk";
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import {getParentUrl, utils} from "../../common/utils";
 
 interface Props {
@@ -50,7 +50,7 @@ export const ApproveWidget: React.FC<Props> = ({
             >
 
                 <IonPage>
-                    <IonHeader>
+                    <IonHeader  collapse="fade">
                         <IonToolbar color="white">
                             <IonTitle>
                                 EMIT Notification

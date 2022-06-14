@@ -1,3 +1,5 @@
+import {Browser} from "@capacitor/browser";
+
 /**
  * Copyright 2020 EMIT Foundation.
  This file is part of E.M.I.T. .
@@ -26,50 +28,13 @@ class Url {
         import: "account/import",
         export: "account/export",
         receive: "account/receive",
-        unlock: "account/unlock"
-    }
+        unlock: "account/unlock",
 
-    private transaction = {
-        tunnel: "tunnel",
-        tunnelNFT: "tunnel-nft",
-        transfer: "transfer",
-        transferNft: "transfer-nft",
-        list: "transaction/list",
-        info: "transaction/info",
+        list: "account/list",
     }
 
     private settings = {
-        setting: "tabs/settings",
-        about: "manage/about",
-    }
-
-    private epoch = {
-        index: "tabs/epoch",
-        altar: "epoch/altar",
-        chaos: "epoch/chaos",
-        deviceRank: "epoch/device/rank",
-        driverRank: "epoch/driver/rank",
-        poolHashRate: "epoch/pool/hashrate",
-        poolInfo: "epoch/pool/info",
-        freeze: "epoch/freeze",
-        unfreeze: "epoch/unfreeze",
-        stargrid: "epoch/starGrid",
-    }
-    private browserBase = "browser"
-
-    private chartBase = "chart"
-
-    private nftTabs = "tabs/nft"
-
-    private scan = "scan";
-
-    private swapWEth = "swap/eth";
-
-    private exchange = {
-        market: "trade/market",
-        swap: "trade/swap",
-        marketSearch: "trade/market/search",
-        marketStatics: "trade/market/statics"
+        setting: "settings",
     }
 
     constructor() {
@@ -79,6 +44,10 @@ class Url {
 
     path_settings = () => {
         return [this.base, this.settings.setting].join("/")
+    }
+
+    path_accounts = () => {
+        return [this.base, this.account.list].join("/")
     }
 
     /**
@@ -111,9 +80,13 @@ class Url {
         const data: any = sessionStorage.getItem("history");
         const pathArr = data && JSON.parse(data)
         if (pathArr && pathArr.length > 0) {
-            const pre = pathArr.pop();
+            let pre = pathArr.pop();
             sessionStorage.setItem("history", JSON.stringify(pathArr));
-            window.location.href = pre;
+            if(!pre || pre=="/"){
+               this.home()
+            }else{
+                window.location.href = pre;
+            }
             // window.location.reload();
         } else {
             this.home();
@@ -122,7 +95,7 @@ class Url {
 
 
     home() {
-        this.goTo(this.base, "/");
+        this.goTo(this.base,"");
         return
     }
 
@@ -139,13 +112,19 @@ class Url {
     accountOpenCreate() {
         const i = Math.max((window.screen.width - 427) / 2, 20);
         const a = "popup=1,height=780,width=427,top=" + Math.max((window.screen.height - 780) / 2, 20) + ",left=" + i;
-        this._win = window.open([this.base, this.account.create].join("/"), "account_popup_win_" + Date.now(), a);
+        const url = [this.base, this.account.create].join("/");
+        this._win = window.open(url, "account_popup_win_" + Date.now(), a) || window.open(url);
+        return !!this._win;
+
     }
 
     accountOpenBackup() {
         const i = Math.max((window.screen.width - 427) / 2, 20);
         const a = "popup=1,height=780,width=427,top=" + Math.max((window.screen.height - 780) / 2, 20) + ",left=" + i;
-        this._win = window.open([this.base, "home/backup"].join("/"), "account_popup_win_" + Date.now(), a);
+        const url = [this.base, "home/backup"].join("/");
+        this._win = window.open(url, "account_popup_win_" + Date.now(), a) || window.open(url);
+        return !!this._win;
+
     }
 
     accountBackup(pre?: string) {
@@ -161,7 +140,11 @@ class Url {
     }
 
     accountExport() {
-        this.goTo([this.base, this.account.export].join("/"), [this.base, this.settings].join("/"));
+        this.goTo([this.base, this.account.export].join("/"), [this.base, this.settings.setting].join("/"));
+    }
+
+    accountList() {
+        this.goTo([this.base, this.account.list].join("/"), [this.base, this.settings.setting].join("/"));
     }
 
     accountUnlock() {
@@ -171,6 +154,10 @@ class Url {
         // }else{
         this.goTo([this.base, this.account.unlock].join("/"), "");
         // }
+    }
+
+    setting() {
+        this.goTo([this.base, this.settings.setting].join("/"), this.base);
     }
 }
 

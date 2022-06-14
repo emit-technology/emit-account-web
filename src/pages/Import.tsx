@@ -129,13 +129,13 @@ class ImportAccount extends React.Component<any, State> {
         return <>
             <IonPage>
                 <IonContent fullscreen>
-                    <IonHeader>
-                        <IonToolbar mode="ios" color="primary">
+                    <IonHeader  collapse="fade">
+                        <IonToolbar mode="ios">
                             <IonTitle>
                                 <IonText>{i18n.t("import")} {i18n.t("wallet")}</IonText>
                             </IonTitle>
                             {/*<IonIcon slot="end" src={downloadOutline} color="primary" size="large"/>*/}
-                            <IonButton fill="outline" color="warning" size="small" slot="end" onClick={() => {
+                            <IonButton fill="outline" size="small" slot="end" onClick={() => {
                                 // window.location.href="/#/account/create"
                                 url.accountCreate();
                             }}>{i18n.t("create")}</IonButton>

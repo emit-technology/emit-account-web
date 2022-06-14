@@ -30,9 +30,25 @@ class Storage{
         return rest;
     }
 
+    createCookie(name, value, days) {
+        let expires;
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime()+(days*24*60*60*1000));
+            expires = "; expires="+date.toUTCString()
+        }
+        else {
+            expires = "";
+        }
+        document.cookie = name+"="+value+expires+"; path=/";
+    }
+
+
     setItem = (key:string,value:any)=>{
-        const v = typeof value === "object"?JSON.stringify(value):value;
-        localStorage.setItem(key,v)
+        if(key){
+            const v = typeof value === "object"?JSON.stringify(value):value;
+            localStorage.setItem(key,v)
+        }
     }
 
     removeItem = (key:string)=>{
@@ -43,9 +59,18 @@ class Storage{
         localStorage.clear();
     }
 
-    keys = (prefix:string)=>{
-        const keys = localStorage.keys(prefix);
-        return keys;
+    keys = (prefix:string):Array<any> =>{
+        //@ts-ignore
+        const len = localStorage.length;
+        const rest:Array<string> = [];
+        for (let i=0;i<len;i++){
+            //@ts-ignore
+            const key:string = localStorage.key(i)
+            if(key && key.startsWith(prefix)){
+               rest.push(key )
+            }
+        }
+        return rest;
     }
 
 }

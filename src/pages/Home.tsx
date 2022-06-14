@@ -6,9 +6,9 @@ import {
     IonTitle,
     IonToolbar,
     IonModal, IonLabel,
-    IonMenuToggle, IonListHeader,
-    IonList, IonItem,
-    IonPopover, IonAvatar, IonAlert,
+    IonMenuToggle,
+    IonItem,
+    IonAlert,
     IonIcon, IonRow, IonCol, IonButton, IonToast
 } from '@ionic/react';
 
@@ -18,17 +18,14 @@ import walletWorker from "../worker/walletWorker";
 import {config} from "../common/config";
 import {AccountDetail} from "../components/AccountDetail";
 import {
-    createOutline,
-    downloadOutline,
+    informationCircleOutline,
     list,
     settingsOutline
 } from "ionicons/icons";
 import url from "../common/url";
 import selfStorage from "../common/storage";
-import Avatar from 'react-avatar';
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
-import {getParentUrl, utils} from "../common/utils";
-
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
+import {AccountListModal} from "../components/AccountListModal";
 interface State {
     account: AccountModel,
     showAccountDetail: boolean,
@@ -39,6 +36,7 @@ interface State {
     showAlert:boolean
     showToast:boolean
     toastMsg?:string
+    showAccountsModal:boolean
 }
 
 
@@ -47,8 +45,6 @@ interface Props {
     refresh: number;
     op?:string;
 }
-
-const BOX_HEIGHT = 750;
 
 class Home extends React.Component<Props, State> {
 
@@ -61,6 +57,7 @@ class Home extends React.Component<Props, State> {
         showAlert:false,
         showToast:false,
         accounts: [],
+        showAccountsModal:false
     }
 
     componentDidMount() {
@@ -147,17 +144,21 @@ class Home extends React.Component<Props, State> {
     }
 
     render() {
-        const {account, selectChainId, showAccountDetail,toastMsg,showToast, accounts,showAlert, showPhaseProtectModal} = this.state;
-        console.log(showAlert)
+        const {account, selectChainId, showAccountDetail,toastMsg,showToast, accounts,showAlert,showAccountsModal, showPhaseProtectModal} = this.state;
         return (
             <IonPage>
-                <IonHeader>
-                    <IonToolbar color="primary">
+                <IonHeader collapse="fade">
+                    <IonToolbar>
+                        <IonIcon slot="start" icon={list} size="large" onClick={()=>{
+                            this.setState({showAccountsModal:true})
+                        }}/>
                         <IonTitle>EMIT Account</IonTitle>
                         <IonMenuToggle slot="end">
                             <IonIcon icon={list} size="large"/>
                         </IonMenuToggle>
-                        <IonIcon slot="end" icon={list} size="large" id="accounts"/>
+                        <IonIcon slot="end" icon={settingsOutline} size="large" onClick={()=>{
+                            url.setting()
+                        }}/>
                     </IonToolbar>
                 </IonHeader>
                 <IonContent fullscreen scrollY>
@@ -167,13 +168,26 @@ class Home extends React.Component<Props, State> {
                                           showAccessedWebsite={this.showAccessedWebsite}
                                           showAccountDetail={this.showAccountDetail}/>
                     }
-
-
+                    <div style={{padding: "24px 12px"}}>
+                        <IonItem lines="none">
+                            <IonLabel className="ion-text-wrap" color="medium">
+                                <IonIcon src={informationCircleOutline}/> <b>EMIT Account</b> is a decentralized multi-chain account component of EMIT CORE.
+                                It is your Web3 identity that integrates the features of multi-account, multi-chain, message signature,
+                                and transaction signature. You can also use <a href="https://emit-assets.emit.technology" target="_blank"><b>EMIT Assets</b></a> to manage your digital assets and cross-chain transactions.
+                                <b>
+                                    EMIT CORE will open up new ways of interacting with the Metaverse.
+                                </b>
+                            </IonLabel>
+                        </IonItem>
+                    </div>
                 </IonContent>
                 <IonModal isOpen={showAccountDetail} className="common-modal" swipeToClose onDidDismiss={() =>
                     this.setState({showAccountDetail: false})}>
                     {
-                        account && <AccountDetail account={account} showChainId={selectChainId} onClose={() => {
+                        account && <AccountDetail account={account} onBackup={()=>{
+                            this.setState({showAccountDetail: false})
+                            this.setShowAlert(true)
+                        }} showChainId={selectChainId} onClose={() => {
                             this.setState({showAccountDetail: false})
                         }}/>
                     }
@@ -209,53 +223,6 @@ class Home extends React.Component<Props, State> {
                         </div>
                     </div>
                 </IonModal>
-                <IonPopover trigger="accounts" className="accounts-popover" arrow={false} dismissOnSelect>
-                    <IonContent>
-                        <IonList>
-                            <IonListHeader>My Account</IonListHeader>
-                            <div className="account-list">
-                                {
-                                    accounts && accounts.length > 0 && accounts.map((v, i) => {
-                                        return <IonItem key={i} onClick={() => {
-                                            this.setAccount(v).catch(e => {
-                                                console.error(e)
-                                            })
-                                        }}>
-                                            <IonAvatar style={{padding: "5px"}} slot="start">
-                                                <Avatar name={v.name} round size="30"/>
-                                            </IonAvatar>
-                                            <IonLabel className="ion-text-wrap">{v.name}</IonLabel>
-                                        </IonItem>
-                                    })
-                                }
-                            </div>
-                            {
-                                !getParentUrl() && <>
-                                    <IonItem onClick={() => {
-                                        url.accountCreate()
-                                    }}>
-                                        <IonIcon icon={createOutline} slot="start"/>
-                                        <IonLabel>Create Account</IonLabel>
-                                    </IonItem>
-                                    <IonItem onClick={() => {
-                                        url.accountImport()
-                                    }}>
-                                        <IonIcon icon={downloadOutline} slot="start"/>
-                                        <IonLabel>Import Account</IonLabel>
-                                    </IonItem>
-                                </>
-                            }
-                            <IonItem onClick={() => {
-                                this.setShowAlert(true);
-                            }}>
-                                <IonIcon icon={settingsOutline} slot="start"/>
-                                <IonLabel>Backup Wallet</IonLabel>
-                            </IonItem>
-
-                        </IonList>
-
-                    </IonContent>
-                </IonPopover>
                 <IonAlert
                     isOpen={showAlert}
                     onDidDismiss={() => this.setShowAlert(false)}
@@ -298,6 +265,27 @@ class Home extends React.Component<Props, State> {
                         }
                     ]}
                 />
+
+                <AccountListModal showModal={showAccountsModal}
+                                  onCancel={() => {
+                                      this.setState({showAccountsModal: false})
+                                  }}
+                                  onOk={(account) => {
+                                      this.setState({showAccountsModal: false})
+                                      this.setAccount(account).catch(e => {
+                                          console.error(e)
+                                      })
+                                  }}
+                                  onReject={() => {
+                                      this.setState({showAccountsModal: false})
+                                  }}
+                                  accounts={accounts}
+                                  selected={account}
+                                  router={this.props.router}
+                />
+
+
+
                 <IonToast
                     mode="ios"
                     isOpen={showToast}
@@ -307,6 +295,7 @@ class Home extends React.Component<Props, State> {
                     message={toastMsg}
                     duration={2000}
                 />
+
             </IonPage>
         );
     }

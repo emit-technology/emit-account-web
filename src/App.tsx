@@ -28,6 +28,8 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 import {SignTxWidgetWeb3,SignMessageWidget,ApproveWidget,WidgetPage} from "./pages/widget";
+import {Settings} from "./pages/Settings";
+import {AccountList} from "./pages/AccountList";
 // import {AccountMenu} from "./components/AccountMenu";
 
 setupIonicReact({
@@ -54,6 +56,8 @@ const App: React.FC = () => {
                                 <Route path="/account/confirm" component={Confirm} exact={true}/>
                                 <Route path="/account/import" component={ImportAccount} exact={true}/>
                                 <Route path="/account/unlock" component={Unlock} exact={true}/>
+                                <Route path="/account/list" component={AccountList} exact={true}/>
+                                <Route path="/settings" component={Settings} exact={true}/>
 
                                 <Route path="/widget/sign/tx" component={SignTxWidgetWeb3} exact={true}/>
                                 <Route path="/widget/sign/msg" component={SignMessageWidget} exact={true}/>

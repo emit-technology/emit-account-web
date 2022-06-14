@@ -42,7 +42,7 @@ export const UnlockModal: React.FC<Props> = ({
             >
 
                 <IonPage>
-                    <IonHeader>
+                    <IonHeader  collapse="fade">
                         <IonToolbar color="white">
                             <IonTitle>Unlock Account</IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {

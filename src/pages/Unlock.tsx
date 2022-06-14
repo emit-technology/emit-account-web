@@ -91,8 +91,8 @@ class Unlock extends React.Component<any, State>{
         return <>
             <IonPage>
                 <IonContent fullscreen>
-                    <IonHeader>
-                        <IonToolbar mode="ios" color="primary">
+                    <IonHeader  collapse="fade">
+                        <IonToolbar mode="ios">
                             <IonTitle>
                                 <IonText>{i18n.t("unlock")} {i18n.t("wallet")}</IonText>
                             </IonTitle>

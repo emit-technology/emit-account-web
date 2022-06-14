@@ -4,7 +4,7 @@ import {
     IonButton, IonPage
 } from '@ionic/react'
 import "./index.css";
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 
 interface Props {
     showModal?: boolean;

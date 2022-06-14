@@ -17,7 +17,7 @@
  */
 
 import service from 'walletService';
-import {AccountModel, ChainType} from "@emit-technology/emit-types";
+import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import selfStorage from "../common/storage";
 import url from "../common/url";
 
@@ -292,6 +292,19 @@ class WalletWorker {
     async setBackedUp(accountId:string):Promise<string> {
         return new Promise((resolve, reject) => {
             service.setBackedUp(accountId,function (data:any){
+                if(data.error){
+                    reject(data.error);
+                }else{
+                    resolve(data.result);
+                }
+            })
+        })
+    }
+
+
+    async removeAccount(accountId:string):Promise<string> {
+        return new Promise((resolve, reject) => {
+            service.removeAccount(accountId,function (data:any){
                 if(data.error){
                     reject(data.error);
                 }else{

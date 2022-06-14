@@ -4,7 +4,7 @@ import {IonMenu,IonHeader,IonToolbar,IonTitle,IonContent,IonList,IonItem} from '
 export const AccountMenu:React.FC = ()=>{
     return <>
         <IonMenu side="start" contentId="main" menuId="account-menu" className="my-custom-menu">
-            <IonHeader>
+            <IonHeader  collapse="fade">
                 <IonToolbar color="tertiary">
                     <IonTitle>Custom Menu</IonTitle>
                 </IonToolbar>
