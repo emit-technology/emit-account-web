@@ -97,7 +97,6 @@ export class Settings extends React.Component<Props, State> {
                             </IonLabel>
                             <IonIcon size="small" src={chevronForwardOutline}/>
                         </IonItem>
-
                     </div>
 
                     <IonItemDivider mode="md">Community</IonItemDivider>

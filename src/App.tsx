@@ -46,7 +46,7 @@ const App: React.FC = () => {
                         {/*<IonSplitPane contentId="main">*/}
                         {/*<AccountMenu/>*/}
                         <Switch>
-                            <IonRouterOutlet id="main">
+                            {/*<IonRouterOutlet id="main">*/}
                                 <Route exact path="/home/:op" render={(props) => <Home op={props.match.params.op} router={routerRef.current}
                                                                               refresh={Math.floor(Date.now() / 1000)}/>}/>
                                 <Route exact path="/home" render={() => <Home router={routerRef.current}
@@ -69,7 +69,7 @@ const App: React.FC = () => {
                                 <Route exact path="/">
                                     <Redirect to="/home"/>
                                 </Route>
-                            </IonRouterOutlet>
+                            {/*</IonRouterOutlet>*/}
                         </Switch>
                         {/*</IonSplitPane>*/}
 
