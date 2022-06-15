@@ -100,7 +100,7 @@ class Unlock extends React.Component<any, State>{
                         {showProgress && <IonProgressBar type="indeterminate"/>}
                     </IonHeader>
                     <div style={{padding:"15px 15px 0",textAlign:"center"}}>
-                        <img src={"./assets/img/welcome.png"} style={{width:"200px"}}/>
+                        <img src={"./assets/img/logo/EMIT.png"} style={{width:"200px"}}/>
                         <h1>{i18n.t("welcome")}</h1>
                         <p><IonText color="medium">The decentralized word waits</IonText></p>
                     </div>

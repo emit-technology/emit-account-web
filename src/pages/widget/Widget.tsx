@@ -233,6 +233,7 @@ export class WidgetPage extends React.Component<Props, State> {
         try {
             await this._showWidget()
             await this.checkWalletStates(config);
+            await this.initAccount();
             this.setState({showAccountsModal: true});
             await this.waitOperation("showAccountsModal");
             await this.checkApprove()
@@ -338,12 +339,12 @@ export class WidgetPage extends React.Component<Props, State> {
     }
 
     checkBackup = async () => {
-        const account = this.state.account;
+        const account = await walletWorker.accountInfoAsync();
         if (account && account.name) {
             if(!account["backedUp"]){
                 this.setShowBackupModal(true)
                 await this.waitOperation("showBackupModal")
-                if(url.accountOpenBackup()){
+                if(!url.accountOpenBackup()){
                     return Promise.reject("The popup window has been blocked.")
                 }
                 await this.waitAccountBackup()

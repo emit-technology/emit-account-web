@@ -31,6 +31,7 @@ import {AccountDetail} from "../components/AccountDetail";
 import {config} from "../common/config";
 import {dappData} from '../data'
 import {NoneData} from "../components/None";
+import selfStorage from "../common/storage";
 
 interface Props{
 
@@ -221,7 +222,18 @@ export class AccountList extends React.Component<Props, State> {
                                 handler: (d) => {
                                     walletWorker.unlockWallet(d["password"]).then(()=>{
                                         const accountId = account.accountId;
+                                        const accountIdLocal = selfStorage.getItem("accountId");
                                         walletWorker.removeAccount(accountId).then((rest: any) => {
+                                            if(accountIdLocal == accountId){
+                                                selfStorage.removeItem("accountId");
+                                                selfStorage.removeItem(accountId);
+                                                walletWorker.accounts().then(acts=>{
+                                                    if(acts && acts.length>0){
+                                                        selfStorage.setItem("accountId",acts[0].accountId);
+                                                        selfStorage.setItem(accountId,acts[0]);
+                                                    }
+                                                })
+                                            }
                                             this.setShowToast(true,`Removed ${account && account.name} successfully`)
                                             this.init().catch(e=>console.error(e))
                                         }).catch(e=>{

@@ -173,7 +173,7 @@ class Home extends React.Component<Props, State> {
                             <IonLabel className="ion-text-wrap" color="medium">
                                 <IonIcon src={informationCircleOutline}/> <b>EMIT Account</b> is a decentralized multi-chain account component of EMIT CORE.
                                 It is your Web3 identity that integrates the features of multi-account, multi-chain, message signature,
-                                and transaction signature. You can also use <a href="https://emit-assets.emit.technology" target="_blank"><b>EMIT Assets</b></a> to manage your digital assets and cross-chain transactions.
+                                and transaction signature. You can also use <a href="https://assets.emit.technology" target="_blank"><b>EMIT Assets</b></a> to manage your digital assets and cross-chain transactions.
                                 <b>
                                     EMIT CORE will open up new ways of interacting with the Metaverse.
                                 </b>
