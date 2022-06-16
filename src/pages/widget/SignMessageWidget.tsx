@@ -50,7 +50,13 @@ export const SignMessageWidget: React.FC<Props> = ({
                 <IonPage>
                     <IonHeader  collapse="fade">
                         <IonToolbar color="white">
-                            <IonTitle>EMIT Notification</IonTitle>
+                            <IonTitle>
+                                EMIT Notification
+                                <div className="powered-by">
+                                    <img src="./assets/icon/icon.png"/>
+                                    <small>powered by emit technology</small>
+                                </div>
+                            </IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
                                 onCancel()
                             }}/>

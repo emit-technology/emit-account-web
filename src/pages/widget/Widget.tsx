@@ -445,12 +445,12 @@ export class WidgetPage extends React.Component<Props, State> {
 
     getAccounts = async (config: IConfig): Promise<{ error: string, result: Array<string> }> => {
         let err = null;
-        let result: AccountModel;
+        let result: Array<AccountModel>;
         try {
             await this._showWidget();
             await this.checkWalletStates(config);
             await this.checkApprove()
-            result = await walletWorker.accountInfo()
+            result = await walletWorker.accounts()
         } catch (e) {
             err = typeof e == "string" ? e : e.message;
             console.error(e)
@@ -460,7 +460,11 @@ export class WidgetPage extends React.Component<Props, State> {
         if (err) {
             return {error: err, result: []}
         } else {
-            return {error: err, result: [result.addresses[config.network.chainType]]}
+            const accounts:Array<string> = [];
+            for(let act of result){
+                accounts.push(act.addresses[config.network.chainType])
+            }
+            return {error: err, result: accounts}
         }
 
     }

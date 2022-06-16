@@ -67,7 +67,13 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                 <IonPage>
                     <IonHeader  collapse="fade">
                         <IonToolbar color="white">
-                            <IonTitle>Sign Transaction</IonTitle>
+                            <IonTitle>
+                                Sign Transaction
+                                <div className="powered-by">
+                                    <img src="./assets/icon/icon.png"/>
+                                    <small>powered by emit technology</small>
+                                </div>
+                            </IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
                                 onCancel()
                             }}/>

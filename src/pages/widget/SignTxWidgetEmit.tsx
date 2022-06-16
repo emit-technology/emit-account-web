@@ -18,14 +18,12 @@ import {
     IonTitle,IonBadge,
     IonToolbar
 } from '@ionic/react'
-import {arrowForwardCircleOutline, close, linkOutline,} from "ionicons/icons";
-import Avatar from "react-avatar";
+import {close, linkOutline,} from "ionicons/icons";
 import "./index.css";
 import {IConfig, PrepareBlock} from "@emit-technology/emit-account-node-sdk";
 import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import {getParentUrl, utils} from "../../common/utils";
 import {EmitFactor} from "../../components/EmitFactor";
-import {Factor} from "@emit-technology/emit-lib";
 import {NoneData} from "../../components/None";
 
 interface Props {
@@ -65,7 +63,14 @@ export const SignTxWidgetEmit: React.FC<Props> = ({
                 <IonPage>
                     <IonHeader  collapse="fade">
                         <IonToolbar color="white">
-                            <IonTitle>Sign Transaction</IonTitle>
+                            <IonTitle>
+                                Sign Transaction
+                                <div className="powered-by">
+                                    <img src="./assets/icon/icon.png"/>
+                                    <small>powered by emit technology</small>
+                                </div>
+                            </IonTitle>
+
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
                                 onCancel()
                             }}/>

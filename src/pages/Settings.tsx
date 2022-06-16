@@ -14,7 +14,7 @@ import {
     globe,
     logoGithub,
     logoMedium,
-    languageSharp
+    languageSharp, logoDiscord, logoYoutube, logoInstagram
 } from "ionicons/icons";
 import url from "../common/url";
 import {AccountModel} from "@emit-technology/emit-lib";
@@ -31,8 +31,6 @@ interface State{
 
 const items = [
     {logo: globe,name: "Website", url: "https://emit.technology", value: "https://emit.technology"},
-    {logo: globe,name: "Blog", url: "https://blog.emit.technology", value: "https://blog.emit.technology"},
-    {logo: globe,name: "Community", url: "https://community.emit.technology", value: "https://community.emit.technology"},
     {logo: globe,name: "Documents", url: "https://docs.emit.technology", value: "https://docs.emit.technology"},
     {logo: paperPlaneSharp,name: "Telegram", url: "https://t.me/emit_protocol", value: "https://t.me/emit_protocol"},
     {logo: logoGithub,name: "Github", url: "https://github.com/emit-technology", value: "https://github.com/emit-technology"},
@@ -40,6 +38,9 @@ const items = [
     {logo: logoTwitter,name: "Twitter", url: "https://twitter.com/emit_protocol", value: "https://twitter.com/emit_protocol"},
     {logo: logoMedium,name: "Medium", url: "https://emitprotocol.medium.com", value: "https://emitprotocol.medium.com"},
     {logo: logoReddit,name: "Reddit", url: "https://www.reddit.com/r/emit_protocol/", value: "https://www.reddit.com/r/emit_protocol/"},
+    {logo: logoDiscord,name: "Discord", url: "https://discord.gg/AMFnCJKkZ4", value: "https://https://discord.gg/AMFnCJKkZ4"},
+    {logo: logoYoutube,name: "Youtube", url: "https://www.youtube.com/channel/UCKlH9YDE_ackvCbwu8Axu9A", value: "https://www.youtube.com/channel/UCKlH9YDE_ackvCbwu8Axu9A"},
+    {logo: logoInstagram,name: "Instagram", url: "https://www.instagram.com/emit_herman/", value: "https://www.instagram.com/emit_herman/"},
 
 ]
 export class Settings extends React.Component<Props, State> {

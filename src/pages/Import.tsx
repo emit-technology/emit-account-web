@@ -101,6 +101,7 @@ class ImportAccount extends React.Component<any, State> {
             accountId = await walletWorker.importPrivateKey(mnemonic, name, password, tips, "");
         }
         if(accountId){
+            await walletWorker.setBackedUp(accountId);
             config.TMP.MNEMONIC = "";
             config.TMP.Account = {}
             selfStorage.setItem("accountId", accountId)
