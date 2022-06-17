@@ -298,7 +298,7 @@ class Backup extends React.Component<any, State> {
                             <IonHeader collapse="fade">
                                 <IonToolbar color="white">
                                     <IonTitle>
-                                        Select Account
+                                        Backup account
                                         <div className="powered-by">
                                             <img src="./assets/icon/icon.png"/>
                                             <small>powered by emit</small>

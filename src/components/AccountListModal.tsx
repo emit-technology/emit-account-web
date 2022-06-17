@@ -1,15 +1,15 @@
 import * as React from 'react';
 import {
     IonModal, IonContent, IonHeader, IonToolbar, IonAvatar,IonText,IonBadge,
-    IonRadio, IonTitle, IonLabel, IonItem, IonIcon, IonPage, IonCol, IonRow,
+    IonRadio,IonFab,IonFabButton, IonTitle, IonLabel, IonItem, IonIcon, IonPage, IonCol, IonRow,
 } from '@ionic/react'
 import {
     checkmarkCircleOutline,
-    close,
+    close, openOutline, personAddOutline,
 } from "ionicons/icons";
 import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import Avatar from "react-avatar";
-import {utils} from "../common/utils";
+import {getParentUrl, utils} from "../common/utils";
 
 interface Props {
     showModal?: boolean;
@@ -80,6 +80,16 @@ export const AccountListModal: React.FC<Props> = ({
                                 </IonItem>
                             })
                         }
+                        {
+                            getParentUrl() && <IonFab vertical="center" horizontal="end" slot="fixed">
+                                <IonFabButton onClick={()=>{
+                                    window.open("https://accounts.emit.technology")
+                                }}>
+                                    <IonIcon icon={openOutline} />
+                                </IonFabButton>
+                            </IonFab>
+                        }
+
                     </IonContent>
                 </IonPage>
             </IonModal>
