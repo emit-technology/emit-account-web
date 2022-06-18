@@ -280,7 +280,6 @@ class Home extends React.Component<Props, State> {
                                       this.setState({showAccountsModal: false})
                                   }}
                                   accounts={accounts}
-                                  selected={account}
                                   router={this.props.router}
                 />
 

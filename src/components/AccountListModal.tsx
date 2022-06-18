@@ -17,13 +17,13 @@ interface Props {
     onOk?: (account: AccountModel) => void;
     onReject?: () => void;
     accounts: Array<AccountModel>;
-    selected: AccountModel;
+    // selected: AccountModel;
 
     router: HTMLIonRouterOutletElement | null;
 }
 
 export const AccountListModal: React.FC<Props> = ({
-                                                      showModal, selected, accounts, onCancel, router,
+                                                      showModal,  accounts, onCancel, router,
                                                       onOk,
                                                       onReject
                                                   }) => {
@@ -72,10 +72,10 @@ export const AccountListModal: React.FC<Props> = ({
                                             <img src="./assets/img/logo/ETH.png" width="20" style={{ transform: 'translateY(5px)'}}/> <small>{utils.ellipsisStr(v.addresses[ChainType.ETH])}</small></IonText>
                                         </div>
                                     </IonLabel>
-                                    {
-                                        selected && selected.accountId == v.accountId && <IonBadge>Current</IonBadge>
+                                    {/*{*/}
+                                    {/*    selected && selected.accountId == v.accountId && <IonBadge>Current</IonBadge>*/}
 
-                                    }
+                                    {/*}*/}
 
                                 </IonItem>
                             })

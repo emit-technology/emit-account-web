@@ -128,8 +128,10 @@ class WalletWorker {
         })
     }
 
-    accountInfoAsync = async ():Promise<any>=>{
-        const accountId = selfStorage.getItem("accountId");
+    accountInfoAsync = async (accountId?:string):Promise<any>=>{
+        if(!accountId){
+            accountId = selfStorage.getItem("accountId");
+        }
         return new Promise((resolve, reject) => {
             service.accountInfo(accountId,function (data:any){
                 if(data.error){
@@ -142,6 +144,22 @@ class WalletWorker {
                 }
             })
         })
+    }
+
+    getAccountByAddressAndChainId = async (address:string,chain:ChainType) =>{
+        if(!address){
+            return Promise.reject("From address can not be null.")
+        }
+        const accounts:Array<AccountModel> = await this.accounts();
+        const accountArr:Array<AccountModel> = accounts.filter(v=>{
+            if(address.toLowerCase() == v.addresses[chain].toLowerCase()){
+                return v
+            }
+        })
+        if(accountArr && accountArr.length > 0 ){
+            return accountArr[0]
+        }
+        return Promise.reject(`Account [${address}] do not exist!`)
     }
 
     async accountInfo(accountId?:any):Promise<AccountModel>{

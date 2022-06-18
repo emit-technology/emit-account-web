@@ -65,7 +65,7 @@ enum Operation {
 export class WidgetPage extends React.Component<Props, State> {
 
     state: State = {
-        account: {name: ""},
+        account: {name:""},
         accounts: [],
 
         showSignMessageModal: false,
@@ -91,25 +91,25 @@ export class WidgetPage extends React.Component<Props, State> {
         })
     }
 
-    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-        if (prevProps.refresh != this.props.refresh || prevState.account && this.state.account && prevState.account.accountId != this.state.account.accountId) {
-            const {connection, config} = this.state;
-            this.initAccount().then((act) => {
-                if (connection && this.isApproved()) {
-                    if (config) {
-                        connection.promise.then(parent => {
-                            parent.onActiveWalletChanged(act.addresses[config.network.chainType])
-                        });
-                    }
-                    connection.promise.then(parent => {
-                        parent.onActiveAccountChanged(act)
-                    });
-                }
-            }).catch(e => {
-                console.error(e)
-            })
-        }
-    }
+    // componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
+        // if (prevProps.refresh != this.props.refresh ) {
+        //     const {connection, config} = this.state;
+        //     this.initAccount().then((act) => {
+        //         if (connection && this.isApproved()) {
+        //             if (config) {
+        //                 connection.promise.then(parent => {
+        //                     parent.onActiveWalletChanged(act.addresses[config.network.chainType])
+        //                 });
+        //             }
+        //             connection.promise.then(parent => {
+        //                 parent.onActiveAccountChanged(act)
+        //             });
+        //         }
+        //     }).catch(e => {
+        //         console.error(e)
+        //     })
+        // }
+    // }
 
     init = async () => {
 
@@ -164,17 +164,35 @@ export class WidgetPage extends React.Component<Props, State> {
             await this._showWidget();
             await this.checkWalletStates(config);
             // this.setShowSignMessageModal(true)
+
+            let account:AccountModel;
+            for (let msg of signArr) {
+                const iAccount = await walletWorker.getAccountByAddressAndChainId(msg.address,msg.chain.valueOf())
+                if(!account){
+                    account = iAccount;
+                }else{
+                    if(iAccount.accountId != account.accountId){
+                        return Promise.reject("Batch signing does not support multiple accounts.")
+                    }
+                }
+            }
+            if(!account){
+                return Promise.reject("Account not found!")
+            }
+
             this.setState({
                 showSignMessageModal:true,
-                msg:signArr
+                msg:signArr,
+                account:account
             })
             await this.waitOperation("showSignMessageModal");
-            const {account} = this.state;
+
+            // const {account} = this.state;
             for (let msg of signArr) {
                 let message = msg.msg;
                 if (msg.chain != ChainType.EMIT) {
                     const message = {
-                        from: account.addresses[msg.chain],
+                        from: msg.address,
                         data: msg.msg,
                         messageStandard: 'signPersonalMessage'
                     }
@@ -182,7 +200,8 @@ export class WidgetPage extends React.Component<Props, State> {
                         message.data = web3Utils.utf8ToHex(msg.msg)
                     }
                 }
-                msg.result = await walletWorker.personSignMsg(msg.chain, message, account.accountId)
+
+                msg.result = await walletWorker.personSignMsg(msg.chain.valueOf(), message, account.accountId)
                 ret.push(msg)
             }
 
@@ -207,7 +226,7 @@ export class WidgetPage extends React.Component<Props, State> {
     private checkStorageAccess = async ()=>{
         return new Promise((resolve, reject) => {
             //@ts-ignore
-            if(document && document.hasStorageAcces && document.requestStorageAccess){
+            if(document && document.hasStorageAccess && document.requestStorageAccess){
                 document.hasStorageAccess().then(hasAccess => {
                     if (hasAccess) {
                         resolve(true)
@@ -236,8 +255,8 @@ export class WidgetPage extends React.Component<Props, State> {
             await this.initAccount();
             this.setState({showAccountsModal: true});
             await this.waitOperation("showAccountsModal");
-            await this.checkApprove()
             ret = this.state.account;
+            await this.checkApprove(ret.accountId)
             // ret = await walletWorker.accountInfoAsync();
         } catch (e) {
             console.error(e)
@@ -259,7 +278,7 @@ export class WidgetPage extends React.Component<Props, State> {
             const gasLevel = await this.getGasLevel(gasChain);
             this.setState({showGasTrackerModal: true,gasLimitHex: gasLimitHex, gasChain:gasChain,gasLevel: gasLevel});
             await this.waitOperation("showGasTrackerModal");
-            await this.checkApprove()
+            // await this.checkApprove()
             ret = this.state.gasPrice;
             // ret = await walletWorker.accountInfoAsync();
         } catch (e) {
@@ -287,13 +306,12 @@ export class WidgetPage extends React.Component<Props, State> {
     }
 
     initAccount = async () => {
-        const acct = await walletWorker.accountInfoAsync();
+        // const acct = await walletWorker.accountInfoAsync();
         const accounts = await walletWorker.accounts();
         this.setState({
-            account: acct,
+            // account: acct,
             accounts: accounts
         })
-        return acct
     }
 
     setShowUnLockModal = (f: boolean) => {
@@ -311,9 +329,9 @@ export class WidgetPage extends React.Component<Props, State> {
         return Promise.resolve(true);
     }
 
-    isApproved = ()=>{
+    isApproved = (accountId:string)=>{
         const refer = getParentUrl();
-        const accountId = selfStorage.getItem("accountId")
+        // const accountId = selfStorage.getItem("accountId")
         let host = refer.replace("http://", "").replace("https://", "");
         // host = host.substr(0, host.indexOf("/"));
         // console.log(dappData.get(host).indexOf(accountId) ,dappData.get(host));
@@ -321,14 +339,14 @@ export class WidgetPage extends React.Component<Props, State> {
 
     }
 
-    checkApprove = async () => {
+    checkApprove = async (accountId) => {
         // const {account} = this.state;
         const refer = getParentUrl();
         if (refer) {
-            if (!this.isApproved()) {
+            if (!this.isApproved(accountId)) {
                 this.setShowApproveDAppModal(true)
                 await this.waitOperation("showApproveModal");
-                const accountId = selfStorage.getItem("accountId")
+                // const accountId = selfStorage.getItem("accountId")
                 let host = refer.replace("http://", "").replace("https://", "");
                 dappData.set(host, accountId);
             }
@@ -338,16 +356,18 @@ export class WidgetPage extends React.Component<Props, State> {
         }
     }
 
-    checkBackup = async () => {
-        const account = await walletWorker.accountInfoAsync();
+    checkBackup = async (account:AccountModel) => {
+        // const account = await walletWorker.accountInfoAsync();
         if (account && account.name) {
             if(!account["backedUp"]){
+                // selfStorage.setItem("accountId", account.accountId);
+                // selfStorage.setItem(account.accountId, account);
                 this.setShowBackupModal(true)
                 await this.waitOperation("showBackupModal")
                 if(!url.accountOpenBackup()){
                     return Promise.reject("The popup window has been blocked.")
                 }
-                await this.waitAccountBackup()
+                await this.waitAccountBackup(account.accountId)
             }
             return Promise.resolve(true);
         } else {
@@ -406,8 +426,8 @@ export class WidgetPage extends React.Component<Props, State> {
 
 
     checkAccountExist = async (): Promise<boolean> => {
-        const accountId = selfStorage.getItem("accountId");
-        if (!accountId) {
+        const accounts = await walletWorker.accounts();
+        if (!accounts || accounts.length == 0) {
             if(!url.accountOpenCreate()){
                return Promise.reject("The popup window has been blocked.")
             }
@@ -427,10 +447,10 @@ export class WidgetPage extends React.Component<Props, State> {
         return Promise.resolve(true);
     }
 
-    waitAccountBackup = async () => {
+    waitAccountBackup = async (accountId:string) => {
         for (let i = 0; i < 600; i++) {
             await this.waitTime(1);
-            const account = await walletWorker.accountInfoAsync()
+            const account = await walletWorker.accountInfoAsync(accountId)
             if (account["backedUp"] && account["backedUp"] == true) {
                 url.closeTopWindow();
                 break;
@@ -449,7 +469,7 @@ export class WidgetPage extends React.Component<Props, State> {
         try {
             await this._showWidget();
             await this.checkWalletStates(config);
-            await this.checkApprove()
+            // await this.checkApprove()
             result = await walletWorker.accounts()
         } catch (e) {
             err = typeof e == "string" ? e : e.message;
@@ -471,7 +491,7 @@ export class WidgetPage extends React.Component<Props, State> {
 
 
     signTransaction = async (txParams: any, config: IConfig): Promise<{ error: string, result: string }> => {
-        let chainParams, err = null, ret = null;
+        let chainParams, err = null, ret = null,from;
         if (utils.isWeb3Chain(config.network.chainType.valueOf())) {
             if (!txParams.nonce) {
                 return {error: "tx nonce is required! ", result: ""}
@@ -487,15 +507,21 @@ export class WidgetPage extends React.Component<Props, State> {
                     hardfork: "byzantium"
                 }
             }
+            from = txParams.from;
+        }else if(config.network.chainType == ChainType.EMIT){
+            from = txParams["address"];
         }
         try {
             await this._showWidget();
             await this.checkWalletStates(config)
-            await this.checkApprove()
-            await this.checkBackup();
-            this.setState({tx: txParams, showTransactionModal: true})
+            const account = await walletWorker.getAccountByAddressAndChainId(from,config.network.chainType.valueOf());
+            await this.checkApprove(account.accountId)
+            await this.checkBackup(account);
+            this.setState({tx: txParams, showTransactionModal: true,account:account})
             await this.waitOperation("showTransactionModal");
-            const {account} = this.state;
+            // const {account} = this.state;
+
+
             ret = await walletWorker.signTx(account.accountId, "", config.network.chainType, txParams, chainParams)
             if(utils.isWeb3Chain(config.network.chainType.valueOf())){
                 ret = "0x"+web3Utils.stripHexPrefix(ret)
@@ -516,10 +542,12 @@ export class WidgetPage extends React.Component<Props, State> {
             }
             await this._showWidget();
             await this.checkWalletStates(config);
-            this.setState({showSignMessageModal: true})
+            const account = await walletWorker.getAccountByAddressAndChainId(msgParams.from,config.network.chainType.valueOf());
+            this.setState({showSignMessageModal: true,account:account})
             await this.waitOperation("showSignMessageModal");
             const standard = msgParams["messageStandard"];
-            const {account} = this.state;
+            // const {account} = this.state;
+
             if (standard == 'signMessage' || standard == 'signPersonalMessage') {
                 ret = await walletWorker.personSignMsg(config.network.chainType, msgParams, account.accountId)
             } else if (standard == 'signTypedMessage') {
@@ -534,7 +562,6 @@ export class WidgetPage extends React.Component<Props, State> {
         } finally {
             await this._hideWidget()
         }
-        console.log(ret,"signMessage");
         return {error: err, result: ret}
     }
 
@@ -620,7 +647,7 @@ export class WidgetPage extends React.Component<Props, State> {
 
     render() {
         const {
-            account, showTransactionModal, showToast, toastMessage, config, msg, showAccountsModal
+            account,showTransactionModal, showToast, toastMessage, config, msg, showAccountsModal
             , showUnlockModal, tx, showApproveModal, showSignMessageModal, accounts,showBackupModal,
             gasChain,showGasTrackerModal,gasLimitHex,gasLevel
         } = this.state;
@@ -727,7 +754,7 @@ export class WidgetPage extends React.Component<Props, State> {
                                           this.setState({showAccountsModal: false, opCode : Operation.cancel})
                                       }}
                                       onOk={(account) => {
-                                          selfStorage.setItem("accountId", account.accountId);
+                                          // selfStorage.setItem("accountId", account.accountId);
                                           this.setState({
                                               showAccountsModal: false,
                                               account: account ,
@@ -739,7 +766,7 @@ export class WidgetPage extends React.Component<Props, State> {
                                           this.setState({showAccountsModal: false, opCode : Operation.reject})
                                       }}
                                       accounts={accounts}
-                                      selected={account}
+                                      // selected={account}
                                       router={this.props.router}
                     />
                 }
