@@ -72,8 +72,9 @@ class Backup extends React.Component<any, State> {
     create = async () => {
         const account: AccountModel = config.TMP.Account; //sessionStorage.getItem("tmpAccount")
         if (account) {
-            const accountId = await walletWorker.importMnemonic(config.TMP.MNEMONIC, account.name, account.password ? account.password : "", account.passwordHint, "");
+            const accountId:any = await walletWorker.importMnemonic(config.TMP.MNEMONIC, account.name, account.password ? account.password : "", account.passwordHint, "");
             if (accountId) {
+                await walletWorker.setBackedUp(accountId)
                 sessionStorage.removeItem("tmpMnemonic");
                 config.TMP.MNEMONIC = ""
                 config.TMP.Account = {}
@@ -132,7 +133,7 @@ class Backup extends React.Component<any, State> {
     confirm = async () => {
         const account: any = config.TMP.Account;//sessionStorage.getItem("tmpAccount")
         if(account && account.name){
-           await this.create()
+            await this.create()
         }else{
             const accountId = selfStorage.getItem("accountId");
             await walletWorker.setBackedUp(accountId)
