@@ -4,10 +4,10 @@ import {
     IonHeader,
     IonPage,
     IonTitle,
-    IonToolbar,
+    IonToolbar,IonList,
     IonModal, IonLabel,
     IonMenuToggle,
-    IonItem,
+    IonItem,IonListHeader,IonSkeletonText,IonAvatar,
     IonAlert,
     IonIcon, IonRow, IonCol, IonButton, IonToast
 } from '@ionic/react';
@@ -37,6 +37,7 @@ interface State {
     showToast:boolean
     toastMsg?:string
     showAccountsModal:boolean
+    showLoading:boolean
 }
 
 
@@ -57,11 +58,19 @@ class Home extends React.Component<Props, State> {
         showAlert:false,
         showToast:false,
         accounts: [],
-        showAccountsModal:false
+        showAccountsModal:false,
+        showLoading:true
     }
 
     componentDidMount() {
-        this.init().catch(e => {
+        this.init().then(()=>{
+            this.setState({
+                showLoading: false
+            })
+        }).catch(e => {
+            this.setState({
+                showLoading: false
+            })
             console.error(e)
         })
         const {op} = this.props;
@@ -80,8 +89,11 @@ class Home extends React.Component<Props, State> {
     }
 
     init = async () => {
-
         await this.initAccount()
+        const isLocked = await walletWorker.isLocked();
+        if(isLocked){
+            url.accountUnlock();
+        }
     }
 
     initAccount = async () => {
@@ -144,7 +156,7 @@ class Home extends React.Component<Props, State> {
     }
 
     render() {
-        const {account, selectChainId, showAccountDetail,toastMsg,showToast, accounts,showAlert,showAccountsModal, showPhaseProtectModal} = this.state;
+        const {account, selectChainId,showLoading, showAccountDetail,toastMsg,showToast, accounts,showAlert,showAccountsModal, showPhaseProtectModal} = this.state;
         return (
             <IonPage>
                 <IonHeader collapse="fade">
@@ -163,10 +175,45 @@ class Home extends React.Component<Props, State> {
                 </IonHeader>
                 <IonContent fullscreen scrollY>
                     {
-                        account &&
-                        <AccountContainer account={account} viewAccountInExplorer={this.viewAccountInExplorer}
-                                          showAccessedWebsite={this.showAccessedWebsite}
-                                          showAccountDetail={this.showAccountDetail}/>
+                       showLoading && <>
+                           <IonList>
+                               <IonListHeader>
+                                   <IonLabel>
+                                       <IonSkeletonText animated style={{ width: '20%' }} />
+                                   </IonLabel>
+                               </IonListHeader>
+                               {
+                                   [1, 2, 3].map((v, i) => {
+                                       return <IonItem key={v}>
+                                           <IonAvatar slot="start">
+                                               <IonSkeletonText animated />
+                                           </IonAvatar>
+                                           <IonLabel>
+                                               <h3>
+                                                   <IonSkeletonText animated style={{ width: '50%' }} />
+                                               </h3>
+                                               <p>
+                                                   <IonSkeletonText animated style={{ width: '80%' }} />
+                                               </p>
+                                               <p>
+                                                   <IonSkeletonText animated style={{ width: '60%' }} />
+                                               </p>
+                                           </IonLabel>
+                                       </IonItem>
+                                   })
+                               }
+                           </IonList>
+                       </>
+                    }
+                    {
+                        !showLoading && <>
+                            {
+                                account &&
+                                <AccountContainer account={account} viewAccountInExplorer={this.viewAccountInExplorer}
+                                                  showAccessedWebsite={this.showAccessedWebsite}
+                                                  showAccountDetail={this.showAccountDetail}/>
+                            }
+                        </>
                     }
                     <div style={{padding: "24px 12px"}}>
                         <IonItem lines="none">

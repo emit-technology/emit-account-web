@@ -1,11 +1,12 @@
 import * as React from 'react';
 
 import './ExploreContainer.css';
-import {IonAvatar, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonText} from '@ionic/react'
+import {IonAvatar, IonIcon,IonBadge, IonItem, IonLabel, IonList, IonListHeader, IonText} from '@ionic/react'
 import {AccountModel, ChainType} from "@emit-technology/emit-lib";
-import {addCircleOutline, personAddOutline, qrCode} from "ionicons/icons";
+import {addCircleOutline, lockOpenOutline, personAddOutline, qrCode} from "ionicons/icons";
 import {config} from "../common/config";
 import {utils} from "../common/utils";
+import walletWorker from "../worker/walletWorker";
 import url from "../common/url";
 
 interface ContainerProps {
@@ -22,6 +23,11 @@ const AccountContainer: React.FC<ContainerProps> = ({account,showAccessedWebsite
       <IonList>
         <IonListHeader color="light" mode="ios">
           <IonLabel><IonText color="medium">Hello, </IonText>{account.name} </IonLabel>
+          <div style={{padding: "6px 12px"}} onClick={()=>{
+            walletWorker.lockWallet().then(()=>{
+              url.accountUnlock()
+            })
+          }}><IonBadge><IonIcon src={lockOpenOutline}/> Lock</IonBadge></div>
         </IonListHeader>
         {
             account && account.addresses && sortAddress.map((chainId,i) => {

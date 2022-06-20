@@ -21,7 +21,7 @@ if(!getParentUrl()){
     if(hash && hash.indexOf("home/backup") == -1){
         const accountId = selfStorage.getItem("accountId");
         if (accountId) {
-            url.accountUnlock();
+            // url.accountUnlock();
         } else {
             url.accountCreate();
         }
