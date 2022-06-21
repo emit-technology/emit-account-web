@@ -283,7 +283,7 @@ class WalletWorker {
         })
     }
 
-    async personSignMsg(chainType:ChainType,msg:any,accountId:string):Promise<string> {
+    async personSignMsg(chainType:ChainType,msg:any,accountId:string):Promise<any> {
         return new Promise((resolve, reject) => {
             service.personSignMessage(chainType,msg,accountId,function (data:any){
                 if(data.error){
@@ -295,7 +295,7 @@ class WalletWorker {
         })
     }
 
-    async signTypedMessage(chainType:ChainType,msg:any,version:string,accountId:string):Promise<string> {
+    async signTypedMessage(chainType:ChainType,msg:any,version:string,accountId:string):Promise<any> {
         return new Promise((resolve, reject) => {
             service.signTypedMessage(chainType,msg,version,accountId,function (data:any){
                 if(data.error){
@@ -307,7 +307,7 @@ class WalletWorker {
         })
     }
 
-    async setBackedUp(accountId:string):Promise<string> {
+    async setBackedUp(accountId:string):Promise<any> {
         return new Promise((resolve, reject) => {
             service.setBackedUp(accountId,function (data:any){
                 if(data.error){
@@ -320,9 +320,9 @@ class WalletWorker {
     }
 
 
-    async removeAccount(accountId:string):Promise<string> {
+    async removeAccount(accountId:string,password:string) :Promise<any> {
         return new Promise((resolve, reject) => {
-            service.removeAccount(accountId,function (data:any){
+            service.removeAccount(accountId,password,function (data:any){
                 if(data.error){
                     reject(data.error);
                 }else{

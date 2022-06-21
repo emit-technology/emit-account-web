@@ -104,7 +104,7 @@ export class Settings extends React.Component<Props, State> {
                     <div>
                         {
                             items.map((v,i)=>{
-                                return <IonItem lines="none" onClick={()=>{
+                                return <IonItem key={i} lines="none" onClick={()=>{
                                    Browser.open({url: v.url}).catch(e=>console.error(e))
                                 }}>
                                     <IonIcon src={v.logo} slot="start" size="small"/>

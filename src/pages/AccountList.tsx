@@ -220,27 +220,25 @@ export class AccountList extends React.Component<Props, State> {
                             {
                                 text: 'Ok',
                                 handler: (d) => {
-                                    walletWorker.unlockWallet(d["password"]).then(()=>{
-                                        const accountId = account.accountId;
-                                        const accountIdLocal = selfStorage.getItem("accountId");
-                                        walletWorker.removeAccount(accountId).then((rest: any) => {
-                                            if(accountIdLocal == accountId){
-                                                selfStorage.removeItem("accountId");
-                                                selfStorage.removeItem(accountId);
-                                                walletWorker.accounts().then(acts=>{
-                                                    if(acts && acts.length>0){
-                                                        selfStorage.setItem("accountId",acts[0].accountId);
-                                                        selfStorage.setItem(accountId,acts[0]);
-                                                    }
-                                                })
-                                            }
-                                            this.setShowToast(true,`Removed ${account && account.name} successfully`)
-                                            this.init().catch(e=>console.error(e))
-                                        }).catch(e=>{
-                                            const err = typeof e == 'string'?e:e.message;
-                                            this.setShowToast(true,err);
-                                            console.error(e)
-                                        })
+                                    if(!d["password"]){
+                                        this.setShowToast(true,"Please input password")
+                                        return;
+                                    }
+                                    const accountId = account.accountId;
+                                    const accountIdLocal = selfStorage.getItem("accountId");
+                                    walletWorker.removeAccount(accountId,d["password"]).then((rest: any) => {
+                                        if(accountIdLocal == accountId){
+                                            selfStorage.removeItem("accountId");
+                                            selfStorage.removeItem(accountId);
+                                            walletWorker.accounts().then(acts=>{
+                                                if(acts && acts.length>0){
+                                                    selfStorage.setItem("accountId",acts[0].accountId);
+                                                    selfStorage.setItem(accountId,acts[0]);
+                                                }
+                                            })
+                                        }
+                                        this.setShowToast(true,`Removed ${account && account.name} successfully`)
+                                        this.init().catch(e=>console.error(e))
                                     }).catch(e=>{
                                         const err = typeof e == 'string'?e:e.message;
                                         this.setShowToast(true,err);
@@ -273,16 +271,14 @@ export class AccountList extends React.Component<Props, State> {
                             {
                                 text: 'Ok',
                                 handler: (d) => {
-                                    walletWorker.unlockWallet(d["password"]).then(()=>{
-                                        const accountId = account.accountId;
-                                        walletWorker.exportMnemonic(accountId, "").then((rest: any) => {
-                                            config.TMP.MNEMONIC = rest;
-                                            url.accountBackup(url.path_accounts())
-                                        }).catch(e=>{
-                                            const err = typeof e == 'string'?e:e.message;
-                                            this.setShowToast(true,err);
-                                            console.error(e)
-                                        })
+                                    if(!d["password"]){
+                                        this.setShowToast(true,"Please input password")
+                                        return;
+                                    }
+                                    const accountId = account.accountId;
+                                    walletWorker.exportMnemonic(accountId, d["password"]).then((rest: any) => {
+                                        config.TMP.MNEMONIC = rest;
+                                        url.accountBackup(url.path_accounts())
                                     }).catch(e=>{
                                         const err = typeof e == 'string'?e:e.message;
                                         this.setShowToast(true,err);

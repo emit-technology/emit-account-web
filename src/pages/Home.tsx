@@ -293,16 +293,14 @@ class Home extends React.Component<Props, State> {
                         {
                             text: 'Ok',
                             handler: (d) => {
-                                walletWorker.unlockWallet(d["password"]).then(()=>{
-                                    const accountId = selfStorage.getItem("accountId");
-                                    walletWorker.exportMnemonic(accountId, "").then((rest: any) => {
-                                        config.TMP.MNEMONIC = rest;
-                                        url.accountBackup("/#/")
-                                    }).catch(e=>{
-                                        const err = typeof e == 'string'?e:e.message;
-                                        this.setShowToast(true,err);
-                                        console.error(e)
-                                    })
+                                if(!d["password"]){
+                                    this.setShowToast(true,"Please input password")
+                                    return;
+                                }
+                                const accountId = account.accountId;
+                                walletWorker.exportMnemonic(accountId, d["password"]).then((rest: any) => {
+                                    config.TMP.MNEMONIC = rest;
+                                    url.accountBackup(url.path_accounts())
                                 }).catch(e=>{
                                     const err = typeof e == 'string'?e:e.message;
                                     this.setShowToast(true,err);
