@@ -1,6 +1,7 @@
 import {Category} from "@emit-technology/emit-account-node-sdk";
 import {ChainType} from "@emit-technology/emit-lib";
 import BigNumber from "bignumber.js";
+import {config} from "./config";
 
 const BN = require('bn.js');
 const format = require('date-format');
@@ -125,7 +126,13 @@ export const utils = {
             return "TRX"
         }
         return ""
+    },
+
+    openExplorer: (address:string,chain:ChainType) =>{
+        const url = `${config.EXPLORER.ADDRESS[ChainType[chain]]}${address}`
+        window.open(url);
     }
+
 }
 
 export function getParentUrl() {

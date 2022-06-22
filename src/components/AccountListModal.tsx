@@ -17,13 +17,13 @@ interface Props {
     onOk?: (account: AccountModel) => void;
     onReject?: () => void;
     accounts: Array<AccountModel>;
-    // selected: AccountModel;
+    selectedAccountId?: string ;
 
     router: HTMLIonRouterOutletElement | null;
 }
 
 export const AccountListModal: React.FC<Props> = ({
-                                                      showModal,  accounts, onCancel, router,
+                                                      showModal,selectedAccountId,  accounts, onCancel, router,
                                                       onOk,
                                                       onReject
                                                   }) => {
@@ -46,7 +46,7 @@ export const AccountListModal: React.FC<Props> = ({
                                 Select Account
                                 <div className="powered-by">
                                     <img src="./assets/icon/icon.png"/>
-                                    <small>powered by emit technology</small>
+                                    <small>powered by EMIT</small>
                                 </div>
                             </IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
@@ -72,11 +72,9 @@ export const AccountListModal: React.FC<Props> = ({
                                             <img src="./assets/img/logo/ETH.png" width="20" style={{ transform: 'translateY(5px)'}}/> <small>{utils.ellipsisStr(v.addresses[ChainType.ETH])}</small></IonText>
                                         </div>
                                     </IonLabel>
-                                    {/*{*/}
-                                    {/*    selected && selected.accountId == v.accountId && <IonBadge>Current</IonBadge>*/}
-
-                                    {/*}*/}
-
+                                    {
+                                        selectedAccountId && selectedAccountId == v.accountId && <IonBadge>Current</IonBadge>
+                                    }
                                 </IonItem>
                             })
                         }

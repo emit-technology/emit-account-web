@@ -51,6 +51,8 @@ interface State {
     gasPrice: string
     gasLimitHex:string
     gasLevel?: any
+
+    dappAccountId?:string
 }
 
 const BOX_HEIGHT = '100%';
@@ -246,14 +248,14 @@ export class WidgetPage extends React.Component<Props, State> {
         })
     }
 
-    requestAccount = async (config: IConfig): Promise<{ error: string; result: AccountModel }> => {
+    requestAccount = async (config: IConfig,accountId?:string): Promise<{ error: string; result: AccountModel }> => {
         let err = null;
         let ret: AccountModel = {name: ""};
         try {
             await this._showWidget()
             await this.checkWalletStates(config);
             await this.initAccount();
-            this.setState({showAccountsModal: true});
+            this.setState({showAccountsModal: true,dappAccountId:accountId});
             await this.waitOperation("showAccountsModal");
             ret = this.state.account;
             await this.checkApprove(ret.accountId)
@@ -649,7 +651,7 @@ export class WidgetPage extends React.Component<Props, State> {
         const {
             account,showTransactionModal, showToast, toastMessage, config, msg, showAccountsModal
             , showUnlockModal, tx, showApproveModal, showSignMessageModal, accounts,showBackupModal,
-            gasChain,showGasTrackerModal,gasLimitHex,gasLevel
+            gasChain,showGasTrackerModal,gasLimitHex,gasLevel,dappAccountId
         } = this.state;
         return (
             <div>
@@ -766,7 +768,7 @@ export class WidgetPage extends React.Component<Props, State> {
                                           this.setState({showAccountsModal: false, opCode : Operation.reject})
                                       }}
                                       accounts={accounts}
-                                      // selected={account}
+                                      selectedAccountId={dappAccountId}
                                       router={this.props.router}
                     />
                 }

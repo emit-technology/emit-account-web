@@ -67,7 +67,7 @@ export const SignTxWidgetEmit: React.FC<Props> = ({
                                 Sign Transaction
                                 <div className="powered-by">
                                     <img src="./assets/icon/icon.png"/>
-                                    <small>powered by emit technology</small>
+                                    <small>powered by EMIT</small>
                                 </div>
                             </IonTitle>
 

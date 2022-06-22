@@ -302,7 +302,7 @@ class Backup extends React.Component<any, State> {
                                         Backup account
                                         <div className="powered-by">
                                             <img src="./assets/icon/icon.png"/>
-                                            <small>powered by emit</small>
+                                            <small>powered by EMIT</small>
                                         </div>
                                     </IonTitle>
                                     <IonIcon slot="end" icon={close} size="large" onClick={() => {

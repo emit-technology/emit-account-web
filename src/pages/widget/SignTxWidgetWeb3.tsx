@@ -6,6 +6,7 @@ import {
     IonCol,
     IonContent,
     IonHeader,
+    IonBadge,IonAlert,
     IonIcon,
     IonItem,
     IonLabel,
@@ -15,14 +16,14 @@ import {
     IonSegment,
     IonSegmentButton,
     IonText,
-    IonTitle,
+    IonTitle,IonRouterLink,
     IonToolbar
 } from '@ionic/react'
-import {arrowForwardCircleOutline, close, linkOutline,} from "ionicons/icons";
+import {arrowForwardCircleOutline, close, informationCircleOutline, linkOutline,} from "ionicons/icons";
 import Avatar from "react-avatar";
 import "./index.css";
 import {IConfig} from "@emit-technology/emit-account-node-sdk";
-import {AccountModel, ChainType} from "@emit-technology/emit-lib";
+import {AccountModel} from "@emit-technology/emit-lib";
 import {getParentUrl, utils} from "../../common/utils";
 import {Transaction} from "web3-core";
 import {GasPriceActionSheet} from "../../components/GasPriceActionSheet";
@@ -54,6 +55,8 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
     const [showGasPriceModal,setShowGasPriceModal] = React.useState(false);
 
     const [gasLevel,setGasLevel] = React.useState({});
+
+    const [showAddressDetail,setShowAddressDetail] = React.useState(false);
     return (
         <>
             {/* Card Modal */}
@@ -71,7 +74,7 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                 Sign Transaction
                                 <div className="powered-by">
                                     <img src="./assets/icon/icon.png"/>
-                                    <small>powered by emit technology</small>
+                                    <small>powered by EMIT</small>
                                 </div>
                             </IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
@@ -85,10 +88,13 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                 <IonRow>
                                     <IonCol size="5">
                                         <IonItem lines="none">
-                                            <IonAvatar>
-                                                <Avatar name={"Test"} round size="30"/>
+                                            <IonAvatar slot="start">
+                                                <Avatar name={account.name} round size="30"/>
                                             </IonAvatar>
-                                            <IonLabel>{account.name}</IonLabel>
+                                            <IonLabel className="ion-text-wrap">
+                                                FROM <b>[{account.name}]</b>
+                                                <div>{utils.ellipsisStr(transaction.from,5)}</div>
+                                            </IonLabel>
                                         </IonItem>
                                     </IonCol>
                                     <IonCol size="2">
@@ -98,12 +104,19 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                     </IonCol>
                                     <IonCol size="5">
                                         <IonItem lines="none">
-                                            <IonAvatar>
-                                                <Avatar name={"aaa"} round size="30"/>
+                                            <IonAvatar slot="start">
+                                                <Avatar name={transaction && transaction.to.slice(2)} round size="30"/>
                                             </IonAvatar>
-                                            <IonLabel>{
-                                               transaction.to
-                                            }</IonLabel>
+                                            <IonLabel className="ion-text-wrap">
+                                                TO
+                                                <div>
+                                                    <IonRouterLink onClick={()=>{
+                                                        setShowAddressDetail(true);
+                                                    }}>
+                                                        {utils.ellipsisStr(transaction.to,5)}
+                                                    </IonRouterLink>
+                                                </div>
+                                            </IonLabel>
                                         </IonItem>
                                     </IonCol>
                                 </IonRow>
@@ -117,6 +130,9 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                         <div>
                                             <IonChip outline color="medium">{config.dapp.name}</IonChip>
                                         </div>
+                                    </IonLabel>
+                                    <IonLabel className="ion-text-wrap">
+                                        <IonText color="medium"><IonIcon src={informationCircleOutline} style={{transform: "translateY(2px)"}}/>INTERACTION: Make sure you trust this host url.</IonText>
                                     </IonLabel>
                                 </IonItem>
                             </div>
@@ -207,6 +223,66 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                 setShowGasPriceModal(false);
                             }} isOpen={showGasPriceModal} chain={config.network.chainType} gasLimit={utils.toHex(transaction.gas)} gasLevel={gasLevel}/>
                         }
+
+                        <IonAlert
+                            isOpen={showAddressDetail}
+                            onDidDismiss={() => setShowAddressDetail(false)}
+                            cssClass='my-custom-class'
+                            header={'To'}
+                            subHeader={'Make sure you trust this address.'}
+                            message={transaction && transaction.to}
+                            buttons={[
+                                {
+                                    text: 'Cancel',
+                                    role: 'cancel',
+                                    cssClass: 'secondary',
+                                    id: 'cancel-button',
+                                    handler: blah => {
+                                        console.log('Confirm Cancel: blah');
+                                    }
+                                },
+                                {
+                                    text: 'View on explorer',
+                                    id: 'confirm-button',
+                                    handler: () => {
+                                      utils.openExplorer(transaction.to,config.network.chainType.valueOf());
+                                    }
+                                }
+                            ]}
+                        />
+
+                        {/*<IonModal*/}
+                        {/*    isOpen={showAddressDetail}*/}
+                        {/*    swipeToClose={true}*/}
+                        {/*    presentingElement={router || undefined}*/}
+                        {/*    className="unlock-modal"*/}
+                        {/*    onDidDismiss={() => setShowAddressDetail(false)}*/}
+                        {/*>*/}
+
+                        {/*    <IonPage>*/}
+                        {/*        <IonHeader collapse="fade">*/}
+                        {/*            <IonToolbar color="white">*/}
+                        {/*                <IonTitle></IonTitle>*/}
+                        {/*                <IonIcon slot="end" icon={close} size="large" onClick={() => {*/}
+                        {/*                    setShowAddressDetail(false)*/}
+                        {/*                }}/>*/}
+                        {/*            </IonToolbar>*/}
+                        {/*        </IonHeader>*/}
+                        {/*        <IonContent fullscreen scrollY>*/}
+                        {/*            <IonItem>*/}
+                        {/*                <IonAvatar>*/}
+                        {/*                    <Avatar name={transaction && transaction.to.slice(2)} round size="30"/>*/}
+                        {/*                </IonAvatar>*/}
+                        {/*                <IonLabel className="ion-text-wrap">*/}
+                        {/*                   <IonBadge color="medium">*/}
+                        {/*                       {transaction && transaction.to}*/}
+                        {/*                   </IonBadge>*/}
+                        {/*                </IonLabel>*/}
+                        {/*            </IonItem>*/}
+                        {/*        </IonContent>*/}
+                        {/*    </IonPage>*/}
+
+                        {/*</IonModal>*/}
 
                     </IonContent>
                 </IonPage>

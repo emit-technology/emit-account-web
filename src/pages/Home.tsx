@@ -324,6 +324,7 @@ class Home extends React.Component<Props, State> {
                                   onReject={() => {
                                       this.setState({showAccountsModal: false})
                                   }}
+                                  selectedAccountId={account && account.accountId}
                                   accounts={accounts}
                                   router={this.props.router}
                 />
