@@ -20,6 +20,7 @@ import {BackupModal} from "./BackupModal";
 import {GasPriceActionSheet} from "../../components/GasPriceActionSheet";
 import BigNumber from "bignumber.js";
 import {config} from "../../common/config";
+import i18n from "i18next";
 
 interface Props {
     router: HTMLIonRouterOutletElement | null;
@@ -148,6 +149,7 @@ export class WidgetPage extends React.Component<Props, State> {
                 batchSignMessage: this.batchSignMsg,
                 requestAccount: this.requestAccount,
                 calcGasPrice: this.calcGasPrice,
+                setLanguage: this.setLanguage,
             },
         });
 
@@ -607,6 +609,15 @@ export class WidgetPage extends React.Component<Props, State> {
 
     setConfig = (config: IConfig): Promise<void> => {
         // this.checkApprove(config)
+        return
+    }
+
+    setLanguage = (code: string): Promise<void> => {
+        selfStorage.setItem("language",code);
+        i18n.changeLanguage(code).then(()=>{
+        }).catch((e:any)=>{
+            console.error(e)
+        })
         return
     }
 

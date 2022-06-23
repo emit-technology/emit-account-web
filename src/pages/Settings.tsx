@@ -1,6 +1,6 @@
 import * as React from "react";
 import {IonPage,IonContent,IonHeader,IonTitle,IonToolbar,IonItemDivider,IonItem,
-    IonLabel,IonIcon} from '@ionic/react';
+    IonLabel,IonIcon,IonAlert} from '@ionic/react';
 import {
     chevronForwardOutline,
     logoFacebook,
@@ -20,14 +20,7 @@ import url from "../common/url";
 import {AccountModel} from "@emit-technology/emit-lib";
 import walletWorker from "../worker/walletWorker";
 import {Browser} from "@capacitor/browser";
-
-interface Props{
-}
-
-interface State{
-    account?:AccountModel
-    showOperatorModal:boolean
-}
+import i18n from '../locales/i18n';
 
 const items = [
     {logo: globe,name: "Website", url: "https://emit.technology", value: "https://emit.technology"},
@@ -43,9 +36,110 @@ const items = [
     {logo: logoInstagram,name: "Instagram", url: "https://www.instagram.com/emit_herman/", value: "https://www.instagram.com/emit_herman/"},
 
 ]
+
+
+const languages:Array<any> = [
+    {
+        name: 'language',
+        type: 'radio',
+        label: 'English',
+        value: 'en_US',
+        checked: "en_US" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: '日本語',
+        value: 'ja_JP',
+        checked: "ja_JP" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: 'русский',
+        value: 'be_BY',
+        checked: "be_BY" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: '한국어',
+        value: 'ko_KR',
+        checked: "ko_KR" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: '繁體中文',
+        value: 'zh_TW',
+        checked: "zh_TW" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: 'Français',
+        value: 'fr_FR',
+        checked: "fr_FR" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: 'Italiano',
+        value: 'it_IT',
+        checked: "it_IT" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: 'Nederlands',
+        value: 'nl_NL',
+        checked: "nl_NL" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: 'Español',
+        value: 'es_ES',
+        checked: "es_ES" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: 'Deutsch',
+        value: 'de_DE',
+        checked: "de_DE" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: 'Português',
+        value: 'pt_BR',
+        checked: "pt_BR" == localStorage.getItem("language")
+    },
+    {
+        name: 'language',
+        type: 'radio',
+        label: '简体中文',
+        value: 'zh_CN',
+        checked: "zh_CN" == localStorage.getItem("language")
+    },
+]
+interface Props{
+    onRefresh:()=>void;
+}
+
+interface State{
+    account?:AccountModel
+    showOperatorModal:boolean
+    showLanguageModal:boolean
+    languages: Array<any>
+}
+
 export class Settings extends React.Component<Props, State> {
     state: State = {
-        showOperatorModal:false
+        showOperatorModal:false,
+        languages:languages,
+        showLanguageModal:false
     };
 
     componentDidMount() {
@@ -67,40 +161,63 @@ export class Settings extends React.Component<Props, State> {
         })
     }
 
+    setLan = (language:string) =>{
+        const {languages} = this.state;
+        localStorage.setItem("language",language);
+        i18n.changeLanguage(language).then(()=>{
+            // window.location.reload();
+        }).catch(e=>{
+            console.error(e)
+        })
+        this.props.onRefresh()
+        const langs = [];
+        for(let lan of languages){
+            lan.checked = language == lan.value;
+            langs.push(lan)
+        }
+        this.setState({languages:langs})
+    }
+
     render() {
+        const {showLanguageModal,languages} = this.state;
         return (
             <IonPage>
                 <IonHeader collapse="fade">
                     <IonToolbar>
                         <IonIcon src={arrowBackOutline} size="large" onClick={()=>url.back()}/>
-                        <IonTitle>Settings</IonTitle>
+                        <IonTitle>{i18n.t("settings")}</IonTitle>
                     </IonToolbar>
                 </IonHeader>
                 <IonContent fullscreen scrollY>
-                    <IonItemDivider mode="md">Identity</IonItemDivider>
+                    <IonItemDivider mode="md">{i18n.t("identity")}</IonItemDivider>
                     <div>
                         <IonItem lines="none" onClick={()=>{
                             url.accountList();
                         }}>
                             <IonIcon src={personCircle} slot="start" size="small"/>
                             <IonLabel className="ion-text-wrap">
-                                Accounts
+                                {i18n.t("accounts")}
                             </IonLabel>
-                            <IonIcon size="small" src={arrowForwardOutline}/>
+                            <IonIcon slot="end" size="small" src={arrowForwardOutline}/>
                         </IonItem>
                     </div>
                     <IonItemDivider mode="md">General</IonItemDivider>
                     <div>
-                        <IonItem lines="none">
+                        <IonItem lines="none" onClick={()=>{
+                           this.setState({showLanguageModal:true})
+                        }}>
                             <IonIcon src={languageSharp} slot="start" size="small"/>
                             <IonLabel className="ion-text-wrap">
-                               Language
+                                {i18n.t("languages")}
                             </IonLabel>
-                            <IonIcon size="small" src={chevronForwardOutline}/>
+                            <IonLabel slot="end" className="ion-text-wrap">
+                                <p>{i18n.t("lang")}</p>
+                            </IonLabel>
+                            <IonIcon slot="end" size="small" src={chevronForwardOutline}/>
                         </IonItem>
                     </div>
 
-                    <IonItemDivider mode="md">Community</IonItemDivider>
+                    <IonItemDivider mode="md">{i18n.t("community")}</IonItemDivider>
                     <div>
                         {
                             items.map((v,i)=>{
@@ -111,13 +228,13 @@ export class Settings extends React.Component<Props, State> {
                                     <IonLabel className="ion-text-wrap">
                                         {v.name}
                                     </IonLabel>
-                                    <IonIcon size="small" src={chevronForwardOutline}/>
+                                    <IonIcon slot="end" size="small" src={chevronForwardOutline}/>
                                 </IonItem>
                             })
                         }
                     </div>
 
-                    <IonItemDivider mode="md">Others</IonItemDivider>
+                    <IonItemDivider mode="md">{i18n.t("others")}</IonItemDivider>
                     <div>
 
                         <IonItem lines="none" onClick={()=>{
@@ -125,20 +242,45 @@ export class Settings extends React.Component<Props, State> {
                         }}>
                             <IonIcon src={readerSharp} slot="start" size="small"/>
                             <IonLabel className="ion-text-wrap">
-                                Term of Use
+                                {i18n.t("termOfUse")}
                             </IonLabel>
-                            <IonIcon size="small" src={chevronForwardOutline}/>
+                            <IonIcon slot="end" size="small" src={chevronForwardOutline}/>
                         </IonItem>
                         <IonItem lines="none" onClick={()=>{
                             Browser.open({url:"https://emit.technology/wallet/privacy-policy.html"})
                         }}>
                             <IonIcon src={readerSharp} slot="start" size="small"/>
                             <IonLabel className="ion-text-wrap">
-                                Service of Policy
+                                {i18n.t("serviceOfPolicy")}
                             </IonLabel>
-                            <IonIcon size="small" src={chevronForwardOutline}/>
+                            <IonIcon slot="end" size="small" src={chevronForwardOutline}/>
                         </IonItem>
                     </div>
+
+                    <IonAlert
+                        isOpen={showLanguageModal}
+                        onDidDismiss={() => this.setState({
+                            showLanguageModal:false
+                        })}
+                        header={i18n.t("language")}
+                        inputs={languages}
+                        buttons={[
+                            {
+                                text: i18n.t("cancel"),
+                                role: 'cancel',
+                                cssClass: 'secondary',
+                                handler: () => {
+                                    console.log('Confirm Cancel');
+                                }
+                            },
+                            {
+                                text: i18n.t("ok"),
+                                handler: (language) => {
+                                    this.setLan(language);
+                                }
+                            }
+                        ]}
+                    />
                 </IonContent>
             </IonPage>
         );

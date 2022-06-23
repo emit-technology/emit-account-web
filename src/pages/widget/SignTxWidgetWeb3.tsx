@@ -105,7 +105,7 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                     <IonCol size="5">
                                         <IonItem lines="none">
                                             <IonAvatar slot="start">
-                                                <Avatar name={transaction && transaction.to.slice(2)} round size="30"/>
+                                                <Avatar name={transaction && transaction.to && transaction.to.slice(2)} round size="30"/>
                                             </IonAvatar>
                                             <IonLabel className="ion-text-wrap">
                                                 TO

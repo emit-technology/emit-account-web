@@ -38,6 +38,7 @@ setupIonicReact({
 
 const App: React.FC = () => {
     const routerRef = React.useRef<HTMLIonRouterOutletElement | null>(null);
+    const [freshNum,setFreshNum] = React.useState(0)
     return (
         <div className="page">
             <div className="page-inner">
@@ -57,7 +58,8 @@ const App: React.FC = () => {
                                 <Route path="/account/import" component={ImportAccount} exact={true}/>
                                 <Route path="/account/unlock" component={Unlock} exact={true}/>
                                 <Route path="/account/list" component={AccountList} exact={true}/>
-                                <Route path="/settings" component={Settings} exact={true}/>
+                                <Route path="/settings" render={()=>
+                                <Settings onRefresh={()=>setFreshNum(freshNum+1)}/>} exact/>
 
                                 <Route path="/widget/sign/tx" component={SignTxWidgetWeb3} exact={true}/>
                                 <Route path="/widget/sign/msg" component={SignMessageWidget} exact={true}/>
