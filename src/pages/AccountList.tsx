@@ -32,6 +32,7 @@ import {config} from "../common/config";
 import {dappData} from '../data'
 import {NoneData} from "../components/None";
 import selfStorage from "../common/storage";
+import i18n from "../locales/i18n"
 
 interface Props{
 
@@ -108,7 +109,7 @@ export class AccountList extends React.Component<Props, State> {
                         <IonIcon slot="start" icon={arrowBackOutline} size="large" onClick={()=>{
                            url.back();
                         }}/>
-                        <IonTitle>Accounts</IonTitle>
+                        <IonTitle>{i18n.t("accounts")}</IonTitle>
                         <IonIcon slot="end" style={{marginRight: "12px"}} icon={personAddOutline} size="large" onClick={()=>{
                             url.accountCreate(url.path_accounts());
                         }}/>
@@ -132,7 +133,7 @@ export class AccountList extends React.Component<Props, State> {
                                            </IonCol>
                                        </IonRow>
                                     </IonCardTitle>
-                                    {v.timestamp && <IonCardSubtitle>Created at {utils.dateFormat(new Date(v.timestamp * 1000))}</IonCardSubtitle>}
+                                    {v.timestamp && <IonCardSubtitle>{i18n.t("createdAt")} {utils.dateFormat(new Date(v.timestamp * 1000))}</IonCardSubtitle>}
                                 </IonCardHeader>
                                 <IonCardContent>
                                     {
@@ -160,7 +161,7 @@ export class AccountList extends React.Component<Props, State> {
                                                     account: v,
                                                     showAlertRemove: true
                                                 })
-                                            }}>Remove Account</IonButton>
+                                            }}>{i18n.t("removeAccount")}</IonButton>
                                         </IonCol>
                                         <IonCol>
                                             <IonButton size="small" fill="outline" expand="block" onClick={()=>{
@@ -168,7 +169,7 @@ export class AccountList extends React.Component<Props, State> {
                                                     account: v,
                                                     showAlert: true
                                                 })
-                                            }}>Backup Account</IonButton>
+                                            }}>{i18n.t("backupAccount")}</IonButton>
                                         </IonCol>
                                         <IonCol>
                                             <IonButton size="small" fill="outline" expand="block" onClick={()=>{
@@ -178,7 +179,7 @@ export class AccountList extends React.Component<Props, State> {
                                                     account: v,
                                                     data:data
                                                 })
-                                            }}>Connected Sites</IonButton>
+                                            }}>{i18n.t("connectedSites")}</IonButton>
                                         </IonCol>
                                     </IonRow>
                                 </IonCardContent>
@@ -257,11 +258,11 @@ export class AccountList extends React.Component<Props, State> {
                             {
                                 name: 'password',
                                 type: 'password',
-                                placeholder: 'Input password'
+                                placeholder: i18n.t("inputPassword")
                             }]}
                         buttons={[
                             {
-                                text: 'Cancel',
+                                text: i18n.t("cancel"),
                                 role: 'cancel',
                                 cssClass: 'secondary',
                                 handler: () => {
@@ -272,7 +273,7 @@ export class AccountList extends React.Component<Props, State> {
                                 text: 'Ok',
                                 handler: (d) => {
                                     if(!d["password"]){
-                                        this.setShowToast(true,"Please input password")
+                                        this.setShowToast(true,i18n.t("inputPassword"))
                                         return;
                                     }
                                     const accountId = account.accountId;

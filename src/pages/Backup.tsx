@@ -33,7 +33,7 @@ import i18n from "../locales/i18n"
 import {config} from "../common/config";
 import walletWorker from "../worker/walletWorker";
 import selfStorage from "../common/storage";
-import {AccountModel, ChainType} from "@emit-technology/emit-lib";
+import {AccountModel} from "@emit-technology/emit-lib";
 
 interface State {
     // mnemonic: Array<string>;

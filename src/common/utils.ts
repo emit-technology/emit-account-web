@@ -88,7 +88,7 @@ export const utils = {
     formatCategoryString: (category: Category): string => {
         const name = utils.fromHex(category.supplier);
         if ( category.symbol === "0000000000000000000000000000000000000000000000000000000000000000" ) {
-            return "EASTER";
+            return "EMIT";
         }
         return name;
     },

@@ -208,7 +208,7 @@ export class Settings extends React.Component<Props, State> {
                         }}>
                             <IonIcon src={languageSharp} slot="start" size="small"/>
                             <IonLabel className="ion-text-wrap">
-                                {i18n.t("languages")}
+                                {i18n.t("language")}
                             </IonLabel>
                             <IonLabel slot="end" className="ion-text-wrap">
                                 <p>{i18n.t("lang")}</p>

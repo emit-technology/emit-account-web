@@ -4,6 +4,7 @@ import {IonButton, IonChip, IonCol, IonIcon, IonRow, IonText, useIonToast} from 
 import {config} from "../common/config";
 import copy from 'copy-to-clipboard';
 import {copyOutline} from "ionicons/icons";
+import i18n from "../locales/i18n";
 
 const QRCode = require('qrcode.react');
 
@@ -52,7 +53,7 @@ export const AccountDetail :React.FC<Props> = ({account,onClose,onBackup,showCha
                         <IonButton expand="block" fill="outline" onClick={()=>{
                             const url = config.EXPLORER.ADDRESS[ChainType[showChainId]]+account.addresses[showChainId];
                             window.open(url,"_blank")
-                        }}>View Detail in Explorer</IonButton>
+                        }}>{i18n.t("viewOnExplorer")}</IonButton>
 
                     </IonCol>
                 </IonRow>
@@ -61,7 +62,7 @@ export const AccountDetail :React.FC<Props> = ({account,onClose,onBackup,showCha
                 <IonCol>
                     <IonButton expand="block" fill="outline" onClick={()=>{
                       onBackup()
-                    }}>Backup account</IonButton>
+                    }}>{i18n.t("backupAccount")}</IonButton>
                 </IonCol>
             </IonRow>
         </div>

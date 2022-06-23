@@ -63,6 +63,7 @@
   "transactionFee": "Transaction Fee",
   "transactionInfo": "Transaction Info",
   "viewCrossInfo": "View Cross Info",
+  "viewOnExplorer": "View Detail in Explorer",
   "close": "Close",
   "confirm": "Confirm",
   "deposit": "Deposit",

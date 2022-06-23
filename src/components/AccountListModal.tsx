@@ -10,6 +10,7 @@ import {
 import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import Avatar from "react-avatar";
 import {getParentUrl, utils} from "../common/utils";
+import i18n from "../locales/i18n";
 
 interface Props {
     showModal?: boolean;
@@ -43,10 +44,10 @@ export const AccountListModal: React.FC<Props> = ({
                     <IonHeader  collapse="fade">
                         <IonToolbar color="white">
                             <IonTitle>
-                                Select Account
+                                {i18n.t("selectAccount")}
                                 <div className="powered-by">
                                     <img src="./assets/icon/icon.png"/>
-                                    <small>powered by EMIT</small>
+                                    <small>{i18n.t("poweredByEmit")}</small>
                                 </div>
                             </IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
@@ -73,7 +74,7 @@ export const AccountListModal: React.FC<Props> = ({
                                         </div>
                                     </IonLabel>
                                     {
-                                        selectedAccountId && selectedAccountId == v.accountId && <IonBadge>Current</IonBadge>
+                                        selectedAccountId && selectedAccountId == v.accountId && <IonBadge>{i18n.t("current")}</IonBadge>
                                     }
                                 </IonItem>
                             })

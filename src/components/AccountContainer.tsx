@@ -8,6 +8,7 @@ import {config} from "../common/config";
 import {utils} from "../common/utils";
 import walletWorker from "../worker/walletWorker";
 import url from "../common/url";
+import i18n from "../locales/i18n";
 
 interface ContainerProps {
   account?:AccountModel
@@ -22,12 +23,12 @@ const AccountContainer: React.FC<ContainerProps> = ({account,showAccessedWebsite
     <>
       <IonList>
         <IonListHeader color="light" mode="ios">
-          <IonLabel><IonText color="medium">Hello, </IonText>{account.name} </IonLabel>
+          <IonLabel><IonText color="medium">{i18n.t("hello")}, </IonText>{account.name} </IonLabel>
           <div style={{padding: "6px 12px"}} onClick={()=>{
             walletWorker.lockWallet().then(()=>{
               url.accountUnlock()
             })
-          }}><IonBadge><IonIcon src={lockOpenOutline}/> Lock</IonBadge></div>
+          }}><IonBadge><IonIcon src={lockOpenOutline}/> {i18n.t("lock")}</IonBadge></div>
         </IonListHeader>
         {
             account && account.addresses && sortAddress.map((chainId,i) => {
