@@ -57,10 +57,11 @@ const App: React.FC = () => {
                                 <Route path="/account/confirm" component={Confirm} exact={true}/>
                                 <Route path="/account/import" component={ImportAccount} exact={true}/>
                                 <Route path="/account/unlock" component={Unlock} exact={true}/>
+                                <Route path="/account/list/2" render={() => <AccountList version={2}/>} exact/>
                                 <Route path="/account/list" component={AccountList} exact={true}/>
                                 <Route path="/settings" render={()=>
-                                <Settings onRefresh={()=>setFreshNum(freshNum+1)}/>} exact/>
-
+                                    <Settings onRefresh={()=>setFreshNum(freshNum+1)}/>} exact
+                                />
                                 <Route path="/widget/sign/tx" component={SignTxWidgetWeb3} exact={true}/>
                                 <Route path="/widget/sign/msg" component={SignMessageWidget} exact={true}/>
                                 <Route path="/widget/approve" component={ApproveWidget} exact={true}/>

@@ -13,9 +13,10 @@ interface Props{
     showChainId:ChainType;
     onClose:()=>void;
     onBackup:()=>void;
+    onExportPrivateKey?:()=>void;
 }
 
-export const AccountDetail :React.FC<Props> = ({account,onClose,onBackup,showChainId})=>{
+export const AccountDetail :React.FC<Props> = ({account,onExportPrivateKey,onClose,onBackup,showChainId})=>{
     const [present, dismiss] = useIonToast();
 
     return <div className="account-box">
@@ -30,10 +31,9 @@ export const AccountDetail :React.FC<Props> = ({account,onClose,onBackup,showCha
                 <IonChip color="dark" id="copied" className="addr-chip" onClick={()=>{
                     // @ts-ignore
                     copy(account.addresses[showChainId]);
-
-                    present({
+                    const data:any = {
                         // buttons: [{ text: 'Close', handler: () => dismiss() }],
-                        message: 'Copied to clipboard !',
+                        message: i18n.t("copied"),
                         duration: 600,
                         position: 'top',
                         color: 'primary',
@@ -41,7 +41,8 @@ export const AccountDetail :React.FC<Props> = ({account,onClose,onBackup,showCha
                         animated: true,
                         onDidDismiss: () => console.log('dismissed'),
                         onWillDismiss: () => console.log('will dismiss'),
-                    }).catch(e=>console.error(e))
+                    }
+                    present(data).catch(e=>console.error(e))
 
                 }}>{account.addresses[showChainId]} <IonIcon src={copyOutline} color="medium" /></IonChip>
             </div>
@@ -61,10 +62,20 @@ export const AccountDetail :React.FC<Props> = ({account,onClose,onBackup,showCha
             <IonRow>
                 <IonCol>
                     <IonButton expand="block" fill="outline" onClick={()=>{
-                      onBackup()
+                        onBackup()
                     }}>{i18n.t("backupAccount")}</IonButton>
                 </IonCol>
             </IonRow>
+            {
+                onExportPrivateKey && <IonRow>
+                    <IonCol>
+                        <IonButton expand="block" fill="outline" onClick={()=>{
+                            onExportPrivateKey()
+                        }}>{i18n.t("exportPrivateKey")}</IonButton>
+                    </IonCol>
+                </IonRow>
+            }
+
         </div>
     </div>
 }

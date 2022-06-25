@@ -28,6 +28,7 @@ import {getParentUrl, utils} from "../../common/utils";
 import {Transaction} from "web3-core";
 import {GasPriceActionSheet} from "../../components/GasPriceActionSheet";
 import {getGasLevel} from "../../rpc";
+import i18n from "../../locales/i18n";
 
 interface Props {
     showModal?: boolean;
@@ -71,10 +72,10 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                     <IonHeader  collapse="fade">
                         <IonToolbar color="white">
                             <IonTitle>
-                                Sign Transaction
+                                {i18n.t("signTx")}
                                 <div className="powered-by">
                                     <img src="./assets/icon/icon.png"/>
-                                    <small>powered by EMIT</small>
+                                    <small>{i18n.t("poweredByEmit")}</small>
                                 </div>
                             </IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
@@ -177,7 +178,7 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                                         setShowGasPriceModal(true);
                                                     }
                                                 })
-                                            }}><IonText color="secondary">Edit</IonText></div>
+                                            }}><IonText color="secondary">{i18n.t("edit")}</IonText></div>
                                             <div className="text-secondary ion-text-right">{utils.fromValue(transaction.gas,0).toString(10)} * {utils.fromValue(transaction.gasPrice,9).toString(10)} GWei</div>
                                             <div className="text-primary ion-text-right">{utils.fromValue(transaction.gas,0).multipliedBy(utils.fromValue(transaction.gasPrice,18)).toString(10)} {utils.defaultFeeCy(config.network.chainType.valueOf())}</div>
                                         </IonLabel>
@@ -204,12 +205,12 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                     <IonCol size="5">
                                         <IonButton expand="block" fill="outline" onClick={() => {
                                             onReject();
-                                        }}>Reject</IonButton>
+                                        }}>{i18n.t("reject")}</IonButton>
                                     </IonCol>
                                     <IonCol size="7">
                                         <IonButton expand="block" onClick={() => {
                                             onOk();
-                                        }}>Confirm</IonButton>
+                                        }}>{i18n.t("ok")}</IonButton>
                                     </IonCol>
                                 </IonRow>
                             </div>
@@ -229,11 +230,11 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                             onDidDismiss={() => setShowAddressDetail(false)}
                             cssClass='my-custom-class'
                             header={'To'}
-                            subHeader={'Make sure you trust this address.'}
+                            subHeader={i18n.t("trustTip")}
                             message={transaction && transaction.to}
                             buttons={[
                                 {
-                                    text: 'Cancel',
+                                    text: i18n.t("cancel"),
                                     role: 'cancel',
                                     cssClass: 'secondary',
                                     id: 'cancel-button',
@@ -242,7 +243,7 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                     }
                                 },
                                 {
-                                    text: 'View on explorer',
+                                    text: i18n.t("viewOnExplorer"),
                                     id: 'confirm-button',
                                     handler: () => {
                                       utils.openExplorer(transaction.to,config.network.chainType.valueOf());
@@ -250,40 +251,6 @@ export const SignTxWidgetWeb3: React.FC<Props> = ({
                                 }
                             ]}
                         />
-
-                        {/*<IonModal*/}
-                        {/*    isOpen={showAddressDetail}*/}
-                        {/*    swipeToClose={true}*/}
-                        {/*    presentingElement={router || undefined}*/}
-                        {/*    className="unlock-modal"*/}
-                        {/*    onDidDismiss={() => setShowAddressDetail(false)}*/}
-                        {/*>*/}
-
-                        {/*    <IonPage>*/}
-                        {/*        <IonHeader collapse="fade">*/}
-                        {/*            <IonToolbar color="white">*/}
-                        {/*                <IonTitle></IonTitle>*/}
-                        {/*                <IonIcon slot="end" icon={close} size="large" onClick={() => {*/}
-                        {/*                    setShowAddressDetail(false)*/}
-                        {/*                }}/>*/}
-                        {/*            </IonToolbar>*/}
-                        {/*        </IonHeader>*/}
-                        {/*        <IonContent fullscreen scrollY>*/}
-                        {/*            <IonItem>*/}
-                        {/*                <IonAvatar>*/}
-                        {/*                    <Avatar name={transaction && transaction.to.slice(2)} round size="30"/>*/}
-                        {/*                </IonAvatar>*/}
-                        {/*                <IonLabel className="ion-text-wrap">*/}
-                        {/*                   <IonBadge color="medium">*/}
-                        {/*                       {transaction && transaction.to}*/}
-                        {/*                   </IonBadge>*/}
-                        {/*                </IonLabel>*/}
-                        {/*            </IonItem>*/}
-                        {/*        </IonContent>*/}
-                        {/*    </IonPage>*/}
-
-                        {/*</IonModal>*/}
-
                     </IonContent>
                 </IonPage>
             </IonModal>

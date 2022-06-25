@@ -5,6 +5,7 @@ import {
 } from '@ionic/react'
 import "./index.css";
 import {AccountModel, ChainType} from "@emit-technology/emit-lib";
+import i18n from "../../locales/i18n";
 
 interface Props {
     showModal?: boolean;
@@ -35,18 +36,18 @@ export const BackupModal: React.FC<Props> = ({
                 <IonPage>
                     <IonContent >
                         <div className="backup-modal">
-                            <h3 style={{textAlign:"center"}}>Protect your funds</h3>
-                            <div><p>Your Secret Recovery Phrase controls your current account.</p>
+                            <h3 style={{textAlign:"center"}}>{i18n.t("protectYourFunds")}</h3>
+                            <div><p>{i18n.t("protectTip1")}</p>
                                 <ul>
-                                    <li><b>Never share your Secret Recovery Phrase with anyone</b></li>
-                                    <li>The EMIT team will never ask for you Secret Recovery Phrase</li>
-                                    <li>Always keep your Secret Recovery Phrase in a secure and secret place</li>
+                                    <li><b>{i18n.t("protectTip2")}</b></li>
+                                    <li>{i18n.t("protectTip3")}</li>
+                                    <li>{i18n.t("protectTip4")}</li>
                                 </ul>
                             </div>
                             <div style={{textAlign:"center"}}>
                                <IonButton expand="block" onClick={()=>{
                                    onOk()
-                               }}>Back up</IonButton>
+                               }}>{i18n.t("ok")}</IonButton>
                             </div>
                         </div>
                     </IonContent>

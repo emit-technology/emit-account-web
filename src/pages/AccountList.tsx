@@ -33,9 +33,10 @@ import {dappData} from '../data'
 import {NoneData} from "../components/None";
 import selfStorage from "../common/storage";
 import i18n from "../locales/i18n"
+import copy from "copy-to-clipboard";
 
 interface Props{
-
+    version?: number
 }
 interface State{
     accounts: Array<AccountModel>
@@ -48,6 +49,9 @@ interface State{
     showAlertRemove: boolean
     data: Array<string>
     showConnectedSitesModal:boolean
+    showCopyAlert:boolean
+    privateKey?:string
+    exportPrivateKey:boolean
 }
 export class AccountList extends React.Component<Props, State> {
 
@@ -60,7 +64,9 @@ export class AccountList extends React.Component<Props, State> {
         toastMsg: "",
         showChain: ChainType._,
         data:[],
-        showConnectedSitesModal:false
+        showConnectedSitesModal:false,
+        showCopyAlert:false,
+        exportPrivateKey:false
     }
 
     componentDidMount() {
@@ -100,7 +106,9 @@ export class AccountList extends React.Component<Props, State> {
     }
 
     render() {
-        const {accounts,showAccountDetail,account,showToast,toastMsg,showAlert,showChain,showAlertRemove,data,showConnectedSitesModal} = this.state;
+        const {accounts,showAccountDetail,exportPrivateKey,showCopyAlert,privateKey,account,showToast,toastMsg,showAlert,showChain,showAlertRemove,data,showConnectedSitesModal} = this.state;
+
+        const {version} = this.props;
 
         return (
             <IonPage>
@@ -194,24 +202,28 @@ export class AccountList extends React.Component<Props, State> {
                                 this.setShowAlert(true)
                             }} showChainId={showChain} onClose={() => {
                                 this.setState({showAccountDetail: false})
-                            }}/>
+                            }} onExportPrivateKey={version && version==2 ? ()=>{
+                                this.setState({showAccountDetail: false, exportPrivateKey:true})
+                                this.setShowAlert(true)
+                            }:undefined}/>
                         }
                     </IonModal>
                     <IonAlert
                         isOpen={showAlertRemove}
                         onDidDismiss={() => this.setShowAlertRemove(false)}
                         cssClass='my-custom-class'
-                        header={`Remove ${ account&& account.name}`}
-                        message="Please make sure you have backed up the account!"
+                        header={`${i18n.t("removeAccount")}`}
+                        message={i18n.t("removeTips")}
+                        subHeader={account && account.name}
                         inputs={[
                             {
                                 name: 'password',
                                 type: 'password',
-                                placeholder: 'Input password'
+                                placeholder: i18n.t("inputPassword")
                             }]}
                         buttons={[
                             {
-                                text: 'Cancel',
+                                text:  i18n.t("cancel"),
                                 role: 'cancel',
                                 cssClass: 'secondary',
                                 handler: () => {
@@ -219,10 +231,10 @@ export class AccountList extends React.Component<Props, State> {
                                 }
                             },
                             {
-                                text: 'Ok',
+                                text: i18n.t("ok"),
                                 handler: (d) => {
                                     if(!d["password"]){
-                                        this.setShowToast(true,"Please input password")
+                                        this.setShowToast(true, i18n.t("inputPassword"))
                                         return;
                                     }
                                     const accountId = account.accountId;
@@ -253,7 +265,7 @@ export class AccountList extends React.Component<Props, State> {
                         isOpen={showAlert}
                         onDidDismiss={() => this.setShowAlert(false)}
                         cssClass='my-custom-class'
-                        header={`Backup account ${account && account.name}`}
+                        header={`${i18n.t("backupAccount")} ${account && account.name}`}
                         inputs={[
                             {
                                 name: 'password',
@@ -270,21 +282,35 @@ export class AccountList extends React.Component<Props, State> {
                                 }
                             },
                             {
-                                text: 'Ok',
+                                text:  i18n.t("ok"),
                                 handler: (d) => {
                                     if(!d["password"]){
                                         this.setShowToast(true,i18n.t("inputPassword"))
                                         return;
                                     }
                                     const accountId = account.accountId;
-                                    walletWorker.exportMnemonic(accountId, d["password"]).then((rest: any) => {
-                                        config.TMP.MNEMONIC = rest;
-                                        url.accountBackup(url.path_accounts())
-                                    }).catch(e=>{
-                                        const err = typeof e == 'string'?e:e.message;
-                                        this.setShowToast(true,err);
-                                        console.error(e)
-                                    })
+                                    if(exportPrivateKey){
+                                        walletWorker.exportPrivateKey(accountId, d["password"],showChain).then((rest: any) => {
+                                            this.setState({showCopyAlert:true,privateKey: rest})
+                                        }).catch(e=>{
+                                            const err = typeof e == 'string'?e:e.message;
+                                            this.setShowToast(true,err);
+                                            console.error(e)
+                                        })
+                                    }else{
+                                        walletWorker.exportMnemonic(accountId, d["password"]).then((rest: any) => {
+                                            if(rest && rest.split(" ").length == 12){
+                                                config.TMP.MNEMONIC = rest;
+                                                url.accountBackup(url.path_accounts())
+                                            }else {
+                                                this.setState({showCopyAlert:true,privateKey: rest})
+                                            }
+                                        }).catch(e=>{
+                                            const err = typeof e == 'string'?e:e.message;
+                                            this.setShowToast(true,err);
+                                            console.error(e)
+                                        })
+                                    }
                                 }
                             }
                         ]}
@@ -304,7 +330,7 @@ export class AccountList extends React.Component<Props, State> {
                         <IonPage>
                             <IonHeader collapse="fade">
                                 <IonToolbar>
-                                    <IonTitle>Connected sites</IonTitle>
+                                    <IonTitle>{i18n.t("connectedSites")}</IonTitle>
                                     <IonIcon slot="end" style={{marginRight: "12px"}} icon={closeOutline} size="large" onClick={()=>{
                                        this.setState({showConnectedSitesModal:false})
                                     }}/>
@@ -313,7 +339,7 @@ export class AccountList extends React.Component<Props, State> {
                             <IonContent fullscreen scrollY>
                                 <IonItem lines="none">
                                     <IonLabel color="medium" className="ion-text-wrap">
-                                        Account <b><IonText color="primary">{account && account.name}</IonText></b> is connected to these sites. They can view your account address.
+                                        {i18n.t("accounts")} <b><IonText color="primary">{account && account.name}</IonText></b> {i18n.t("connectTip")}
                                     </IonLabel>
                                 </IonItem>
                                 {
@@ -328,14 +354,41 @@ export class AccountList extends React.Component<Props, State> {
                                             <IonButton fill="outline" size="small" slot="end" onClick={()=>{
                                                 dappData.remove(v,account && account.accountId)
                                                 this.init().catch(e=>console.log(e))
-                                            }}>Disconnect</IonButton>
+                                            }}>{i18n.t("disconnect")}</IonButton>
                                         </IonItem>
-                                    }):<NoneData desc="No data"/>
+                                    }):<NoneData desc={i18n.t("noData")}/>
                                 }
                             </IonContent>
                         </IonPage>
                     </IonModal>
 
+                    <IonAlert
+                        isOpen={showCopyAlert}
+                        onDidDismiss={() => this.setState({
+                            showCopyAlert:false
+                        })}
+                        header={i18n.t("backupAccount")}
+                        message={privateKey}
+                        buttons={[
+                            {
+                                text: i18n.t("cancel"),
+                                role: 'cancel',
+                                cssClass: 'secondary',
+                                handler: () => {
+                                    this.setState({showCopyAlert:false,privateKey:""});
+                                }
+                            },
+                            {
+                                text: i18n.t("copy"),
+                                handler: () => {
+                                    copy(privateKey)
+                                    copy(privateKey)
+                                    this.setState({showCopyAlert:false,privateKey:""});
+                                    this.setShowToast(true,i18n.t("copied"))
+                                }
+                            }
+                        ]}
+                    />
                 </IonContent>
             </IonPage>
         );

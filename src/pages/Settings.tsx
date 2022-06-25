@@ -201,7 +201,7 @@ export class Settings extends React.Component<Props, State> {
                             <IonIcon slot="end" size="small" src={arrowForwardOutline}/>
                         </IonItem>
                     </div>
-                    <IonItemDivider mode="md">General</IonItemDivider>
+                    <IonItemDivider mode="md">{i18n.t("general")}</IonItemDivider>
                     <div>
                         <IonItem lines="none" onClick={()=>{
                            this.setState({showLanguageModal:true})

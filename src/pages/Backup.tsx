@@ -126,7 +126,7 @@ class Backup extends React.Component<any, State> {
             await this.confirm();
         }else{
             await this.preBackup()
-            return Promise.reject("Does not match, please select again!")
+            return Promise.reject(i18n.t("notMatch"))
         }
     }
 
@@ -154,7 +154,8 @@ class Backup extends React.Component<any, State> {
         const {showProgress, showBackupModal,showToast,toastMessage, tempMnemonic, rIndex} = this.state;
         let mnemonic = config.TMP.MNEMONIC.split(" ");
 
-        if(showBackupModal){
+        const isMnemonic = mnemonic && mnemonic.length == 12;
+        if(showBackupModal && isMnemonic){
             mnemonic = [];
             for(let i=0;i<12;i++){
                 mnemonic.push("***")
@@ -276,7 +277,7 @@ class Backup extends React.Component<any, State> {
                                                    config.TMP.MNEMONIC = "";
                                                    url.back();
                                                }
-                                           }}> Later Backup</IonButton>
+                                           }}>{i18n.t("laterBackup")}</IonButton>
                             </IonCol>
                             <IonCol size="7">
                                 <IonButton disabled={showProgress} mode="ios" expand="block" onClick={() => {
@@ -299,10 +300,10 @@ class Backup extends React.Component<any, State> {
                             <IonHeader collapse="fade">
                                 <IonToolbar color="white">
                                     <IonTitle>
-                                        Backup account
+                                        {i18n.t("backupAccount")}
                                         <div className="powered-by">
                                             <img src="./assets/icon/icon.png"/>
-                                            <small>powered by EMIT</small>
+                                            <small>{i18n.t("poweredByEmit")}</small>
                                         </div>
                                     </IonTitle>
                                     <IonIcon slot="end" icon={close} size="large" onClick={() => {
@@ -313,7 +314,7 @@ class Backup extends React.Component<any, State> {
                             <IonContent scrollY>
                                 <IonItem>
                                     <IonLabel className="ion-text-wrap">
-                                        Please select <b><IonText color="secondary">#{rIndex+1}th</IonText></b> word of the mnemonic phrase.
+                                        {i18n.t("pleaseSelect")} <b><IonText color="secondary">#{rIndex+1}th</IonText></b> {i18n.t("pleaseSelect2")}
                                     </IonLabel>
                                 </IonItem>
                                 <IonItem>

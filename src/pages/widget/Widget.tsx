@@ -410,14 +410,14 @@ export class WidgetPage extends React.Component<Props, State> {
         }
         if(opCode == Operation.cancel){
             this.setState({ opCode:Operation._ })
-            return Promise.reject("User canceled!");
+            return Promise.reject(i18n.t("userCancel"));
         }
         if(opCode == Operation.reject){
             this.setState({ opCode:Operation._ })
-            return Promise.reject("User rejected!");
+            return Promise.reject(i18n.t("userReject"));
         }
         this.setState({ opCode:Operation._ })
-        return Promise.reject("Operation timeout!");
+        return Promise.reject(i18n.t("operationTimeout"));
     }
 
     waitTime = async (defaultSecond = 0.5) => {
@@ -648,7 +648,7 @@ export class WidgetPage extends React.Component<Props, State> {
 
     unlockWallet = async (password: string) => {
         if (!password) {
-            this.setShowToast(true, "Please Input Password!");
+            this.setShowToast(true, i18n.t("inputPassword"));
             return;
         }
         await walletWorker.unlockWallet(password)

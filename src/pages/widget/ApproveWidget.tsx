@@ -1,24 +1,19 @@
 import * as React from 'react';
 import {
-    IonModal, IonContent, IonHeader, IonToolbar, IonSegment,
-    IonSegmentButton, IonButton, IonCheckbox,
-    IonChip, IonText, IonTitle, IonMenuToggle, IonAvatar, IonLabel, IonItem,
-    IonItemDivider, IonRow, IonCol, IonIcon, IonPage
+    IonModal, IonContent, IonHeader, IonToolbar,
+    IonButton,
+    IonChip, IonText, IonTitle, IonAvatar, IonLabel, IonItem,
+    IonRow, IonCol, IonIcon, IonPage
 } from '@ionic/react'
 import {
-    arrowForwardCircleOutline,
-    chevronForward,
-    chevronForwardCircle,
-    chevronForwardCircleOutline,
-    chevronForwardOutline,
     close, linkOutline,
-    list
 } from "ionicons/icons";
 import Avatar from "react-avatar";
 import "./index.css";
 import {IConfig} from "@emit-technology/emit-account-node-sdk";
-import {AccountModel, ChainType} from "@emit-technology/emit-lib";
+import {AccountModel} from "@emit-technology/emit-lib";
 import {getParentUrl, utils} from "../../common/utils";
+import i18n from '../../locales/i18n';
 
 interface Props {
     showModal?: boolean;
@@ -53,10 +48,10 @@ export const ApproveWidget: React.FC<Props> = ({
                     <IonHeader  collapse="fade">
                         <IonToolbar color="white">
                             <IonTitle>
-                                EMIT Notification
+                                {i18n.t("connectSite")}
                                 <div className="powered-by">
                                     <img src="./assets/icon/icon.png"/>
-                                    <small>powered by EMIT</small>
+                                    <small>{i18n.t("poweredByEmit")}</small>
                                 </div>
                             </IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
@@ -81,7 +76,7 @@ export const ApproveWidget: React.FC<Props> = ({
                                 borderBottom: "1px solid #ddd", fontWeight: 500,
                                 padding: "12px 36px 24px", color: "#4d4d4d"
                             }}>
-                                Your current account is not connected
+                                {i18n.t("notConnect")}
                             </div>
                             <div style={{minHeight: "100px", overflowY: "scroll"}}>
                                 <div style={{padding: "12px 0", borderBottom: "1px solid #ddd"}}>
@@ -105,12 +100,12 @@ export const ApproveWidget: React.FC<Props> = ({
                                 <IonCol size="5">
                                     <IonButton expand="block" fill="outline" onClick={() => {
                                         onReject()
-                                    }}>Reject</IonButton>
+                                    }}>{i18n.t("reject")} </IonButton>
                                 </IonCol>
                                 <IonCol size="7">
                                     <IonButton expand="block" onClick={() => {
                                         onOk();
-                                    }}>Connect</IonButton>
+                                    }}>{i18n.t("connect")} </IonButton>
                                 </IonCol>
                             </IonRow>
                         </div>

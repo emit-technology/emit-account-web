@@ -11,6 +11,7 @@ import {
 import "./index.css";
 import {getParentUrl} from "../../common/utils";
 import {IConfig} from "@emit-technology/emit-account-node-sdk";
+import i18n from "../../locales/i18n";
 
 interface Props {
     showModal?: boolean;
@@ -44,7 +45,7 @@ export const UnlockModal: React.FC<Props> = ({
                 <IonPage>
                     <IonHeader  collapse="fade">
                         <IonToolbar color="white">
-                            <IonTitle>Unlock Account</IonTitle>
+                            <IonTitle>{i18n.t("unlockAccount")}</IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
                                 onCancel()
                             }}/>
@@ -63,7 +64,7 @@ export const UnlockModal: React.FC<Props> = ({
                                     </IonLabel>
                                 </IonItem>
                                 <IonItem>
-                                    <IonLabel position="floating">Please enter your account password</IonLabel>
+                                    <IonLabel position="floating">{i18n.t("inputPassword")}</IonLabel>
                                     <IonInput type="password" onIonChange={(e)=>{
                                         setPassword(e.detail.value);
                                     }}/>
@@ -79,14 +80,14 @@ export const UnlockModal: React.FC<Props> = ({
                                     <IonCol>
                                         <IonButton color="primary" expand="block" onClick={() => {
                                             onOk(password);
-                                        }}>Unlock</IonButton>
+                                        }}>{i18n.t("unlock")}</IonButton>
                                     </IonCol>
                                 </IonRow>
                                 <IonRow>
                                     <IonCol>
                                         <div className="powered-by">
                                             <img src="./assets/icon/icon.png"/>
-                                            <small>powered by EMIT</small>
+                                            <small>{i18n.t("poweredByEmit")}</small>
                                         </div>
                                     </IonCol>
                                 </IonRow>

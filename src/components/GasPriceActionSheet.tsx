@@ -101,12 +101,12 @@ export const GasPriceActionSheet: React.FC<Props> = ({
             <IonList style={{overflowY: "scroll"}}>
                 <IonRadioGroup value={gasPrice} onIonChange={e => setGasPrice(e.detail.value)}>
                     <IonListHeader>
-                        <IonLabel>Select Gas Price</IonLabel>
+                        <IonLabel>{i18n.t("selectGasPrice")}</IonLabel>
                     </IonListHeader>
                     {radioItems()}
                 </IonRadioGroup>
                 <IonListHeader>
-                    <IonLabel>Customer</IonLabel>
+                    <IonLabel>{i18n.t("custom")}</IonLabel>
                 </IonListHeader>
                 <IonItem>
                     <IonInput type="number" min="1" value={gasPrice} onIonChange={e => {
@@ -118,12 +118,12 @@ export const GasPriceActionSheet: React.FC<Props> = ({
                 <IonCol size="4">
                     <IonButton expand="block" fill="outline" onClick={() => {
                         onClose();
-                    }}>Cancel</IonButton>
+                    }}>{i18n.t("cancel")}</IonButton>
                 </IonCol>
                 <IonCol size="8">
                     <IonButton expand="block" onClick={() => {
                         onSelect(gasPrice)
-                    }}>Ok</IonButton>
+                    }}>{i18n.t('ok')}</IonButton>
                 </IonCol>
             </IonRow>
         </IonModal>

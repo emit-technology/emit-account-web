@@ -103,9 +103,9 @@ class WalletWorker {
         })
     }
 
-    async exportPrivateKey(accountId:string,password:string){
+    async exportPrivateKey(accountId:string,password:string,chain:ChainType){
         return new Promise((resolve, reject)=>{
-            service.exportPrivateKey(accountId,password,function (data:any){
+            service.exportPrivateKey(accountId,password,chain,function (data:any){
                 if(data.error){
                     reject(data.error);
                 }else{

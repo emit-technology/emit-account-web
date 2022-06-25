@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {
-    IonModal, IonContent, IonHeader, IonToolbar, IonSegment,
-    IonSegmentButton, IonButton,
-    IonChip, IonText, IonTitle, IonMenuToggle, IonAvatar, IonLabel, IonItem,
-    IonItemDivider, IonRow, IonCol, IonIcon, IonPage
+    IonModal, IonContent, IonHeader, IonToolbar,
+     IonButton,
+    IonChip, IonText, IonTitle, IonAvatar, IonLabel, IonItem,
+    IonRow, IonCol, IonIcon, IonPage
 } from '@ionic/react'
 import {
     close, linkOutline,
@@ -11,8 +11,9 @@ import {
 import Avatar from "react-avatar";
 import "./index.css";
 import {IConfig} from "@emit-technology/emit-account-node-sdk";
-import {AccountModel, ChainType} from "@emit-technology/emit-lib";
+import {AccountModel} from "@emit-technology/emit-lib";
 import {getParentUrl} from "../../common/utils";
+import i18n from "../../locales/i18n";
 
 interface Props {
     showModal?: boolean;
@@ -51,10 +52,10 @@ export const SignMessageWidget: React.FC<Props> = ({
                     <IonHeader  collapse="fade">
                         <IonToolbar color="white">
                             <IonTitle>
-                                EMIT Notification
+                                {i18n.t("emitNotify")}
                                 <div className="powered-by">
                                     <img src="./assets/icon/icon.png"/>
-                                    <small>powered by EMIT</small>
+                                    <small>{i18n.t("poweredByEmit")}</small>
                                 </div>
                             </IonTitle>
                             <IonIcon slot="end" icon={close} size="large" onClick={() => {
@@ -71,7 +72,7 @@ export const SignMessageWidget: React.FC<Props> = ({
                                 padding: "6px",
                                 textAlign: "center"
                             }}>
-                                <h1 style={{fontSize: "24px"}}>Sign Message</h1>
+                                <h1 style={{fontSize: "24px"}}>{i18n.t("signMessage")}</h1>
                             </div>
                             <div style={{marginTop: "5px", borderBottom: "1px solid #ddd"}}>
                                 {
@@ -110,7 +111,7 @@ export const SignMessageWidget: React.FC<Props> = ({
                                 padding: "0px 24px 6px",
                                 color: "#4d4d4d"
                             }}>
-                                Signing Message
+                                {i18n.t("signMessage")}
                             </div>
                             <div  className="pre-data">
                                 <pre>
@@ -122,12 +123,12 @@ export const SignMessageWidget: React.FC<Props> = ({
                                     <IonCol size="5">
                                         <IonButton expand="block" fill="outline" onClick={() => {
                                             onReject();
-                                        }}>Reject</IonButton>
+                                        }}>{i18n.t("reject")}</IonButton>
                                     </IonCol>
                                     <IonCol size="7">
                                         <IonButton expand="block" onClick={() => {
                                             onOk()
-                                        }}>Sign</IonButton>
+                                        }}>{i18n.t("ok")}</IonButton>
                                     </IonCol>
                                 </IonRow>
                             </div>

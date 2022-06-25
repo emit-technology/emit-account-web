@@ -26,6 +26,9 @@ import url from "../common/url";
 import selfStorage from "../common/storage";
 import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import {AccountListModal} from "../components/AccountListModal";
+import i18n from '../locales/i18n';
+import copy from "copy-to-clipboard";
+
 interface State {
     account: AccountModel,
     showAccountDetail: boolean,
@@ -38,6 +41,8 @@ interface State {
     toastMsg?:string
     showAccountsModal:boolean
     showLoading:boolean
+    showCopyAlert:boolean
+    privateKey?:string
 }
 
 
@@ -59,7 +64,8 @@ class Home extends React.Component<Props, State> {
         showToast:false,
         accounts: [],
         showAccountsModal:false,
-        showLoading:true
+        showLoading:true,
+        showCopyAlert:false
     }
 
     componentDidMount() {
@@ -156,7 +162,7 @@ class Home extends React.Component<Props, State> {
     }
 
     render() {
-        const {account, selectChainId,showLoading, showAccountDetail,toastMsg,showToast, accounts,showAlert,showAccountsModal, showPhaseProtectModal} = this.state;
+        const {account, selectChainId,showLoading,showCopyAlert,privateKey, showAccountDetail,toastMsg,showToast, accounts,showAlert,showAccountsModal, showPhaseProtectModal} = this.state;
         return (
             <IonPage>
                 <IonHeader collapse="fade">
@@ -242,16 +248,13 @@ class Home extends React.Component<Props, State> {
                 <IonModal isOpen={showPhaseProtectModal} className="common-modal" swipeToClose onDidDismiss={() =>
                     this.setState({showPhaseProtectModal: false})}
                 >
-                    <div style={{lineHeight: "1.8", padding: '12px 24px'}}>
-                        <h3 style={{textAlign: "center"}}>Protect your funds</h3>
-                        <div>
-                            <p>
-                                Your Secret Recovery Phrase controls your current account.
-                            </p>
+                    <div className="backup-modal">
+                        <h3 style={{textAlign:"center"}}>{i18n.t("protectYourFunds")}</h3>
+                        <div><p>{i18n.t("protectTip1")}</p>
                             <ul>
-                                <li><b>Never share your Secret Recovery Phrase with anyone</b></li>
-                                <li>The EMIT team will never ask for you Secret Recovery Phrase</li>
-                                <li>Always keep your Secret Recovery Phrase in a secure and secret place</li>
+                                <li><b>{i18n.t("protectTip2")}</b></li>
+                                <li>{i18n.t("protectTip3")}</li>
+                                <li>{i18n.t("protectTip4")}</li>
                             </ul>
                         </div>
                     </div>
@@ -274,16 +277,16 @@ class Home extends React.Component<Props, State> {
                     isOpen={showAlert}
                     onDidDismiss={() => this.setShowAlert(false)}
                     cssClass='my-custom-class'
-                    header={'Backup account'}
+                    header={i18n.t("backupAccount")}
                     inputs={[
                         {
                             name: 'password',
                             type: 'password',
-                            placeholder: 'Input password'
+                            placeholder: i18n.t("inputPassword")
                         }]}
                     buttons={[
                         {
-                            text: 'Cancel',
+                            text: i18n.t("cancel"),
                             role: 'cancel',
                             cssClass: 'secondary',
                             handler: () => {
@@ -291,16 +294,20 @@ class Home extends React.Component<Props, State> {
                             }
                         },
                         {
-                            text: 'Ok',
+                            text:  i18n.t("ok"),
                             handler: (d) => {
                                 if(!d["password"]){
-                                    this.setShowToast(true,"Please input password")
+                                    this.setShowToast(true,i18n.t("inputPassword") )
                                     return;
                                 }
                                 const accountId = account.accountId;
                                 walletWorker.exportMnemonic(accountId, d["password"]).then((rest: any) => {
-                                    config.TMP.MNEMONIC = rest;
-                                    url.accountBackup(url.path_accounts())
+                                    if(rest && rest.split(" ").length == 12){
+                                        config.TMP.MNEMONIC = rest;
+                                        url.accountBackup(url.path_accounts())
+                                    }else{
+                                        this.setState({privateKey:rest,showCopyAlert:true})
+                                    }
                                 }).catch(e=>{
                                     const err = typeof e == 'string'?e:e.message;
                                     this.setShowToast(true,err);
@@ -329,7 +336,33 @@ class Home extends React.Component<Props, State> {
                                   router={this.props.router}
                 />
 
-
+                <IonAlert
+                    isOpen={showCopyAlert}
+                    onDidDismiss={() => this.setState({
+                        showCopyAlert:false
+                    })}
+                    header={i18n.t("backupAccount")}
+                    message={privateKey}
+                    buttons={[
+                        {
+                            text: i18n.t("cancel"),
+                            role: 'cancel',
+                            cssClass: 'secondary',
+                            handler: () => {
+                                this.setState({showCopyAlert:false,privateKey:""});
+                            }
+                        },
+                        {
+                            text: i18n.t("copy"),
+                            handler: () => {
+                                copy(privateKey)
+                                copy(privateKey)
+                                this.setState({showCopyAlert:false,privateKey:""});
+                                this.setShowToast(true,i18n.t("copied"))
+                            }
+                        }
+                    ]}
+                />
 
                 <IonToast
                     mode="ios"

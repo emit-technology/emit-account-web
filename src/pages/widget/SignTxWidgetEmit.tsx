@@ -25,6 +25,7 @@ import {AccountModel, ChainType} from "@emit-technology/emit-lib";
 import {getParentUrl, utils} from "../../common/utils";
 import {EmitFactor} from "../../components/EmitFactor";
 import {NoneData} from "../../components/None";
+import i18n from "../../locales/i18n";
 
 interface Props {
     showModal?: boolean;
@@ -64,10 +65,10 @@ export const SignTxWidgetEmit: React.FC<Props> = ({
                     <IonHeader  collapse="fade">
                         <IonToolbar color="white">
                             <IonTitle>
-                                Sign Transaction
+                                {i18n.t("signTx")}
                                 <div className="powered-by">
                                     <img src="./assets/icon/icon.png"/>
-                                    <small>powered by EMIT</small>
+                                    <small>{i18n.t("poweredByEmit")}</small>
                                 </div>
                             </IonTitle>
 
@@ -78,33 +79,6 @@ export const SignTxWidgetEmit: React.FC<Props> = ({
                     </IonHeader>
                     <IonContent fullscreen scrollY>
                         <div style={{position: "relative"}}>
-                            {/*<div style={{marginTop: "5px", borderBottom: "1px solid #ddd"}}>*/}
-                            {/*    <IonRow>*/}
-                            {/*        <IonCol size="5">*/}
-                            {/*            <IonItem lines="none">*/}
-                            {/*                <IonAvatar>*/}
-                            {/*                    <Avatar name={account.name} round size="30"/>*/}
-                            {/*                </IonAvatar>*/}
-                            {/*                <IonLabel>{account.name}</IonLabel>*/}
-                            {/*            </IonItem>*/}
-                            {/*        </IonCol>*/}
-                            {/*        <IonCol size="2">*/}
-                            {/*            <IonItem lines="none">*/}
-                            {/*                <IonLabel><IonIcon src={arrowForwardCircleOutline}/></IonLabel>*/}
-                            {/*            </IonItem>*/}
-                            {/*        </IonCol>*/}
-                            {/*        <IonCol size="5">*/}
-                            {/*            <IonItem lines="none">*/}
-                            {/*                <IonAvatar>*/}
-                            {/*                    <Avatar name={toAddress} round size="30"/>*/}
-                            {/*                </IonAvatar>*/}
-                            {/*                <IonLabel>{*/}
-                            {/*                    toAddress*/}
-                            {/*                }</IonLabel>*/}
-                            {/*            </IonItem>*/}
-                            {/*        </IonCol>*/}
-                            {/*    </IonRow>*/}
-                            {/*</div>*/}
                             <div style={{padding: "12px"}}>
                                 <IonItem lines="none">
                                     <IonIcon src={linkOutline} slot="start"/>
@@ -221,12 +195,12 @@ export const SignTxWidgetEmit: React.FC<Props> = ({
                                     <IonCol size="5">
                                         <IonButton expand="block" fill="outline" onClick={() => {
                                             onReject();
-                                        }}>Reject</IonButton>
+                                        }}>{i18n.t("reject")}</IonButton>
                                     </IonCol>
                                     <IonCol size="7">
                                         <IonButton expand="block" onClick={() => {
                                             onOk();
-                                        }}>Confirm</IonButton>
+                                        }}>{i18n.t("ok")}</IonButton>
                                     </IonCol>
                                 </IonRow>
                             </div>
