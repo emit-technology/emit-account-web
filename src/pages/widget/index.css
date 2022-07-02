@@ -39,7 +39,7 @@
 @media (max-width: 769px) {
   .unlock-modal{
     --max-width: 90vw !important;
-    --max-height: 36vh !important;
+    --max-height: 50vh !important;
   }
 }
 
