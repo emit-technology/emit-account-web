@@ -184,11 +184,13 @@ export class WidgetPage extends React.Component<Props, State> {
                 return Promise.reject("Account not found!")
             }
 
-            this.setState({
-                showSignMessageModal:true,
-                msg:signArr,
-                account:account
-            })
+            setTimeout(()=>{
+                this.setState({
+                    showSignMessageModal:true,
+                    msg:signArr,
+                    account:account
+                })
+            },200)
             await this.waitOperation("showSignMessageModal");
 
             // const {account} = this.state;
@@ -706,8 +708,7 @@ export class WidgetPage extends React.Component<Props, State> {
                 />
                 }
 
-                {
-                    msg && account && config && <SignMessageWidget showModal={showSignMessageModal}
+                    <SignMessageWidget showModal={showSignMessageModal}
                                        onCancel={() => {
                                            // this._hideWidget()
                                            this.setState({showSignMessageModal: false, opCode : Operation.cancel})
@@ -720,7 +721,6 @@ export class WidgetPage extends React.Component<Props, State> {
                                        }}
                                        router={this.props.router} msg={msg} account={account} config={config}/>
 
-                }
 
                 {
                     <ApproveWidget showModal={showApproveModal}

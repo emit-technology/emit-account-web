@@ -82,7 +82,7 @@ export const AccountListModal: React.FC<Props> = ({
                         {
                             getParentUrl() && <IonFab vertical="center" horizontal="end" slot="fixed">
                                 <IonFabButton onClick={()=>{
-                                    window.open("https://accounts.emit.technology")
+                                    window.open("./#/")
                                 }}>
                                     <IonIcon icon={openOutline} />
                                 </IonFabButton>

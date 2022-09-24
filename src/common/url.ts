@@ -31,6 +31,7 @@ class Url {
         unlock: "account/unlock",
 
         list: "account/list",
+        reset: "account/reset",
     }
 
     private settings = {
@@ -158,6 +159,10 @@ class Url {
 
     setting() {
         this.goTo([this.base, this.settings.setting].join("/"), this.base);
+    }
+
+    accountReset() {
+        this.goTo([this.base, this.account.reset].join("/"), [this.base, this.account.unlock].join("/"));
     }
 }
 

@@ -24,6 +24,7 @@ import {
     IonTitle,
     IonToolbar,
     IonList,
+    IonCheckbox,
     IonItem,
     IonLabel, IonSegment, IonSegmentButton,
     IonInput, IonText, IonButton, IonToast, IonProgressBar, IonIcon, IonTextarea, IonSpinner
@@ -46,6 +47,7 @@ interface State {
     showProgress: boolean
     showPasswordTips: boolean
     segment: string
+    resetPassword: boolean
 }
 
 class ImportAccount extends React.Component<any, State> {
@@ -60,10 +62,27 @@ class ImportAccount extends React.Component<any, State> {
         toastMessage: "",
         showProgress: false,
         showPasswordTips: false,
-        segment: "mnemonic"
+        segment: "mnemonic",
+        resetPassword: false
     }
 
     componentDidMount() {
+        this.init().catch(e=>{
+            console.error(e)
+        })
+    }
+
+    init = async () =>{
+        const accountIdLocal = selfStorage.getItem("accountId");
+        if(!!accountIdLocal){
+            const isLocked = await walletWorker.isLocked();
+            if(isLocked){
+                this.setShowToast(true , "Wallet is unlock!")
+                setTimeout(()=>{
+                    url.accountUnlock();
+                },2000)
+            }
+        }
     }
 
     confirm = async () => {
@@ -124,7 +143,7 @@ class ImportAccount extends React.Component<any, State> {
     }
 
     render() {
-        const {name, password, rePassword, tips, showToast, showPasswordTips, toastMessage, showProgress, mnemonic, segment} = this.state;
+        const {name, password, rePassword, tips, showToast,resetPassword, showPasswordTips, toastMessage, showProgress, mnemonic, segment} = this.state;
         const accountIdLocal = selfStorage.getItem("accountId");
 
         return <>
@@ -230,6 +249,7 @@ class ImportAccount extends React.Component<any, State> {
                                         })
                                     }}/>
                                 </IonItem>
+
                             </>
                         }
                     </IonList>

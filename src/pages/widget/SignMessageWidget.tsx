@@ -115,7 +115,7 @@ export const SignMessageWidget: React.FC<Props> = ({
                             </div>
                             <div  className="pre-data">
                                 <pre>
-                                                {JSON.stringify(msg,undefined,2)}
+                                                { msg && JSON.stringify(msg,undefined,2)}
                                             </pre>
                             </div>
                             <div className="btn-bottom">

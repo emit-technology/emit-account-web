@@ -35,6 +35,7 @@ import url from "../common/url";
 import i18n from "../locales/i18n";
 import {chevronBack} from "ionicons/icons";
 import {config} from "../common/config";
+import selfStorage from "../common/storage";
 
 interface State {
     name: string;
@@ -61,7 +62,22 @@ class CreateAccount extends React.Component<any, State> {
     }
 
     componentDidMount() {
+        this.init().catch(e=>{
+            console.error(e)
+        })
+    }
 
+    init = async () =>{
+        const accountIdLocal = selfStorage.getItem("accountId");
+        if(!!accountIdLocal){
+            const isLocked = await walletWorker.isLocked();
+            if(isLocked){
+                this.setShowToast(true , "Wallet is unlock!")
+                setTimeout(()=>{
+                    url.accountUnlock();
+                },2000)
+            }
+        }
     }
 
     confirm = async () => {

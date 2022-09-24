@@ -6,12 +6,13 @@ import {
     IonRow, IonCol, IonIcon, IonPage
 } from '@ionic/react'
 import {
-    close, linkOutline,
+    close, linkOutline, openOutline,
 } from "ionicons/icons";
 import "./index.css";
 import {getParentUrl} from "../../common/utils";
 import {IConfig} from "@emit-technology/emit-account-node-sdk";
 import i18n from "../../locales/i18n";
+import url from "../../common/url";
 
 interface Props {
     showModal?: boolean;
@@ -52,7 +53,7 @@ export const UnlockModal: React.FC<Props> = ({
                         </IonToolbar>
                     </IonHeader>
                     <IonContent fullscreen scrollY>
-                        <div style={{position:"relative"}}>
+                        <div style={{position:"relative" ,display: "flex",flexDirection: "column"}}>
                             <div >
                                 <IonItem lines="none">
                                     <IonIcon src={linkOutline} slot="start"/>
@@ -64,7 +65,7 @@ export const UnlockModal: React.FC<Props> = ({
                                     </IonLabel>
                                 </IonItem>
                                 <IonItem>
-                                    <IonLabel position="floating">{i18n.t("inputPassword")}</IonLabel>
+                                    <IonLabel position="stacked">{i18n.t("inputPassword")}</IonLabel>
                                     <IonInput type="password" onIonChange={(e)=>{
                                         setPassword(e.detail.value);
                                     }}/>
@@ -83,6 +84,15 @@ export const UnlockModal: React.FC<Props> = ({
                                         }}>{i18n.t("unlock")}</IonButton>
                                     </IonCol>
                                 </IonRow>
+                                <div className="ft-tip">
+                                    <div style={{textAlign: "center",fontWeight:700, padding: '6px',cursor:"pointer" }} onClick={()=>{
+                                        window.open("#/account/reset")
+                                    }}><IonText color="tertiary"><small>Forgot password?</small></IonText></div>
+
+                                    <div style={{textAlign: "center",fontWeight:700, padding: '6px',cursor:"pointer" }} onClick={()=>{
+                                        window.open("#/")
+                                    }}><IonText color="tertiary"><small>Accounts <IonIcon src={openOutline}/></small></IonText></div>
+                                </div>
                                 <IonRow>
                                     <IonCol>
                                         <div className="powered-by">

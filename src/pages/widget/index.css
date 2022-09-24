@@ -32,14 +32,14 @@
 
 .unlock-modal{
   --max-width: 80vw;
-  --max-height: 30vh;
+  --max-height: 350px;
   --border-radius: 25px;
 }
 
 @media (max-width: 769px) {
   .unlock-modal{
     --max-width: 90vw !important;
-    --max-height: 50vh !important;
+    --max-height: 350px !important;
   }
 }
 
@@ -76,4 +76,11 @@
   overflow-y: scroll;
   border-radius: 10px;
   color: var(--ion-color-medium)
+}
+
+.ft-tip{
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: space-evenly;
 }

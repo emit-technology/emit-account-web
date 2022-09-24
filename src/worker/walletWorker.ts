@@ -332,6 +332,22 @@ class WalletWorker {
         })
     }
 
+    async resetAccount(mnemonic: string,password:string) {
+        const data: any = {
+            mnemonic: mnemonic,
+            password: password,
+        }
+        return new Promise((resolve, reject)=>{
+            service.resetAccount(data, function (data: any) {
+                if(data.error){
+                    reject(data.error);
+                }else{
+                    resolve(data.result);
+                }
+            })
+        })
+
+    }
 }
 
 const walletWorker = new WalletWorker();
