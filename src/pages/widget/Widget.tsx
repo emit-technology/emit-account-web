@@ -437,6 +437,7 @@ export class WidgetPage extends React.Component<Props, State> {
             if(!url.accountOpenCreate()){
                return Promise.reject("The popup window has been blocked.")
             }
+            await this._hideWidget();
             await this.waitAccountCreate();
         }
         return Promise.resolve(true);
@@ -746,11 +747,12 @@ export class WidgetPage extends React.Component<Props, State> {
                                      this.setState({showUnlockModal: false})
                                  }}
                                  onOk={(password) => {
-                                     this.unlockWallet(password).catch(e => {
+                                     this.unlockWallet(password).then(()=>{
+                                         this.setState({showUnlockModal: false})
+                                     }).catch(e => {
                                          const err = typeof e == 'string' ? e : e.message;
                                          this.setShowToast(true, err);
                                      });
-                                     this.setState({showUnlockModal: false})
                                  }}
 
                                  onReject={() => {
