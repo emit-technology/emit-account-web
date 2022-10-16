@@ -117,6 +117,7 @@ export class WidgetPage extends React.Component<Props, State> {
     init = async () => {
 
         const connection = connectToParent({
+            parentOrigin:"*",
             // Methods child is exposing to parent.
             methods: {
                 getAccounts: (config) => {
@@ -437,20 +438,26 @@ export class WidgetPage extends React.Component<Props, State> {
             if(!url.accountOpenCreate()){
                return Promise.reject("The popup window has been blocked.")
             }
-            await this._hideWidget();
+            // await this._hideWidget();
             await this.waitAccountCreate();
         }
         return Promise.resolve(true);
     }
 
     waitAccountCreate = async () => {
-        for (let i = 0; i < 600; i++) {
-            await this.waitTime(1);
-            if (this.getStorageAccountId()) {
-                url.closeTopWindow();
-                break;
+        // if( utils.isIos()){
+
+            // window.location.href = ""
+        //    technology.emit.wallet
+        // }else{
+            for (let i = 0; i < 600; i++) {
+                await this.waitTime(1);
+                if (this.getStorageAccountId()) {
+                    url.closeTopWindow();
+                    break;
+                }
             }
-        }
+        // }
         return Promise.resolve(true);
     }
 

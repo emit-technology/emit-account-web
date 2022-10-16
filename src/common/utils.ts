@@ -17,7 +17,7 @@ export const utils = {
         return v
     },
 
-    isWeb3Chain: function (chain:ChainType):boolean{
+    isWeb3Chain: function (chain: ChainType): boolean {
         return chain == ChainType.ETH || chain == ChainType.BSC
     },
     formatValueString: function (value: string | BigNumber | number | undefined, fix: number = 3): string {
@@ -87,7 +87,7 @@ export const utils = {
 
     formatCategoryString: (category: Category): string => {
         const name = utils.fromHex(category.supplier);
-        if ( category.symbol === "0000000000000000000000000000000000000000000000000000000000000000" ) {
+        if (category.symbol === "0000000000000000000000000000000000000000000000000000000000000000") {
             return "EMIT";
         }
         return name;
@@ -111,24 +111,34 @@ export const utils = {
     },
 
 
-    isSafari : ():boolean =>{
+    isSafari: (): boolean => {
         return ((/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)))
     },
 
-    defaultFeeCy: (chain:ChainType):string =>{
-        if(chain == ChainType.ETH){
+    isIos: (): boolean => {
+        //@ts-ignore
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        //@ts-ignore
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            return true
+        }
+        return false;
+    },
+
+    defaultFeeCy: (chain: ChainType): string => {
+        if (chain == ChainType.ETH) {
             return "ETH"
-        }else if(chain == ChainType.BSC){
+        } else if (chain == ChainType.BSC) {
             return "BNB"
-        }else if(chain == ChainType.SERO){
+        } else if (chain == ChainType.SERO) {
             return "SERO"
-        }else if(chain == ChainType.TRON){
+        } else if (chain == ChainType.TRON) {
             return "TRX"
         }
         return ""
     },
 
-    openExplorer: (address:string,chain:ChainType) =>{
+    openExplorer: (address: string, chain: ChainType) => {
         const url = `${config.EXPLORER.ADDRESS[ChainType[chain]]}${address}`
         window.open(url);
     }
@@ -140,7 +150,7 @@ export function getParentUrl() {
     if (window.parent !== window) {
         try {
             url = window.parent.location.href;
-        }catch (e) {
+        } catch (e) {
             url = document.referrer;
         }
     }
