@@ -15,6 +15,8 @@ ReactDOM.render(
     document.getElementById('root')
 );
 
+selfStorage.setItem("accessFlag","yes");
+
 //Widget not call this
 if(!getParentUrl()){
     const hash = window.location.hash;

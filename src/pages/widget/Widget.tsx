@@ -50,10 +50,10 @@ interface State {
     showGasTrackerModal: boolean;
     gasChain: ChainType,
     gasPrice: string
-    gasLimitHex:string
+    gasLimitHex: string
     gasLevel?: any
 
-    dappAccountId?:string
+    dappAccountId?: string
 }
 
 const BOX_HEIGHT = '100%';
@@ -68,7 +68,7 @@ enum Operation {
 export class WidgetPage extends React.Component<Props, State> {
 
     state: State = {
-        account: {name:""},
+        account: {name: ""},
         accounts: [],
 
         showSignMessageModal: false,
@@ -95,29 +95,29 @@ export class WidgetPage extends React.Component<Props, State> {
     }
 
     // componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any) {
-        // if (prevProps.refresh != this.props.refresh ) {
-        //     const {connection, config} = this.state;
-        //     this.initAccount().then((act) => {
-        //         if (connection && this.isApproved()) {
-        //             if (config) {
-        //                 connection.promise.then(parent => {
-        //                     parent.onActiveWalletChanged(act.addresses[config.network.chainType])
-        //                 });
-        //             }
-        //             connection.promise.then(parent => {
-        //                 parent.onActiveAccountChanged(act)
-        //             });
-        //         }
-        //     }).catch(e => {
-        //         console.error(e)
-        //     })
-        // }
+    // if (prevProps.refresh != this.props.refresh ) {
+    //     const {connection, config} = this.state;
+    //     this.initAccount().then((act) => {
+    //         if (connection && this.isApproved()) {
+    //             if (config) {
+    //                 connection.promise.then(parent => {
+    //                     parent.onActiveWalletChanged(act.addresses[config.network.chainType])
+    //                 });
+    //             }
+    //             connection.promise.then(parent => {
+    //                 parent.onActiveAccountChanged(act)
+    //             });
+    //         }
+    //     }).catch(e => {
+    //         console.error(e)
+    //     })
+    // }
     // }
 
     init = async () => {
 
         const connection = connectToParent({
-            parentOrigin:"*",
+            parentOrigin: "*",
             // Methods child is exposing to parent.
             methods: {
                 getAccounts: (config) => {
@@ -151,6 +151,7 @@ export class WidgetPage extends React.Component<Props, State> {
                 requestAccount: this.requestAccount,
                 calcGasPrice: this.calcGasPrice,
                 setLanguage: this.setLanguage,
+                checkAccess: this.checkAccess
             },
         });
 
@@ -162,6 +163,22 @@ export class WidgetPage extends React.Component<Props, State> {
         await this.initAccount()
     }
 
+    checkAccess = async ()=>{
+        const accessFlag = selfStorage.getItem("accessFlag");
+        alert(accessFlag);
+        if (!!accessFlag) {
+            if (document && document.hasStorageAccess && document.requestStorageAccess) {
+                const hasAccess = await document.hasStorageAccess()
+                if (hasAccess) {
+                    return true
+                }
+            }else{
+                return true
+            }
+        }
+        return false;
+    }
+
     batchSignMsg = async (config: IConfig, signArr: Array<SignWrapped>): Promise<{ error: string; result: Array<SignWrapped> }> => {
         let err = null;
         const ret: Array<SignWrapped> = [];
@@ -170,28 +187,28 @@ export class WidgetPage extends React.Component<Props, State> {
             await this.checkWalletStates(config);
             // this.setShowSignMessageModal(true)
 
-            let account:AccountModel;
+            let account: AccountModel;
             for (let msg of signArr) {
-                const iAccount = await walletWorker.getAccountByAddressAndChainId(msg.address,msg.chain.valueOf())
-                if(!account){
+                const iAccount = await walletWorker.getAccountByAddressAndChainId(msg.address, msg.chain.valueOf())
+                if (!account) {
                     account = iAccount;
-                }else{
-                    if(iAccount.accountId != account.accountId){
+                } else {
+                    if (iAccount.accountId != account.accountId) {
                         return Promise.reject("Batch signing does not support multiple accounts.")
                     }
                 }
             }
-            if(!account){
+            if (!account) {
                 return Promise.reject("Account not found!")
             }
 
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.setState({
-                    showSignMessageModal:true,
-                    msg:signArr,
-                    account:account
+                    showSignMessageModal: true,
+                    msg: signArr,
+                    account: account
                 })
-            },200)
+            }, 200)
             await this.waitOperation("showSignMessageModal");
 
             // const {account} = this.state;
@@ -217,7 +234,7 @@ export class WidgetPage extends React.Component<Props, State> {
         } finally {
             await this._hideWidget()
         }
-        console.log(ret,"batchSignMsg");
+        console.log(ret, "batchSignMsg");
         return {error: err, result: ret}
     }
 
@@ -230,37 +247,39 @@ export class WidgetPage extends React.Component<Props, State> {
         await this.checkIsLocked();
     }
 
-    private checkStorageAccess = async ()=>{
+    private checkStorageAccess = async () => {
         return new Promise((resolve, reject) => {
+            console.log("----> document && document.hasStorageAccess: ", document && !!document.hasStorageAccess && document.requestStorageAccess)
             //@ts-ignore
-            if(document && document.hasStorageAccess && document.requestStorageAccess){
+            if (document && document.hasStorageAccess && document.requestStorageAccess) {
                 document.hasStorageAccess().then(hasAccess => {
+                    console.log("----> document && document.hasAccess: ", hasAccess)
                     if (hasAccess) {
                         resolve(true)
                         // storage access has been granted already.
                     } else {
                         document.requestStorageAccess().then(
-                            ()=> resolve(true),
-                            ()=> reject("User reject storage access!")
+                            () => resolve(true),
+                            () => reject("User reject storage access!")
                         )
                         // storage access hasn't been granted already;
                         // you may want to call requestStorageAccess().
                     }
                 });
-            }else{
+            } else {
                 resolve(true)
             }
         })
     }
 
-    requestAccount = async (config: IConfig,accountId?:string): Promise<{ error: string; result: AccountModel }> => {
+    requestAccount = async (config: IConfig, accountId?: string): Promise<{ error: string; result: AccountModel }> => {
         let err = null;
         let ret: AccountModel = {name: ""};
         try {
             await this._showWidget()
             await this.checkWalletStates(config);
             await this.initAccount();
-            this.setState({showAccountsModal: true,dappAccountId:accountId});
+            this.setState({showAccountsModal: true, dappAccountId: accountId});
             await this.waitOperation("showAccountsModal");
             ret = this.state.account;
             await this.checkApprove(ret.accountId)
@@ -275,15 +294,20 @@ export class WidgetPage extends React.Component<Props, State> {
         return {error: err, result: ret}
     }
 
-    calcGasPrice = async (gasLimitHex:string, gasChain:ChainType,config: IConfig): Promise<{ error: string; result: string }> => {
+    calcGasPrice = async (gasLimitHex: string, gasChain: ChainType, config: IConfig): Promise<{ error: string; result: string }> => {
         let err = null;
-        let ret:string = null;
-        console.log("calc gas price",gasLimitHex)
+        let ret: string = null;
+        console.log("calc gas price", gasLimitHex)
         try {
             await this._showWidget()
             await this.checkWalletStates(config);
             const gasLevel = await this.getGasLevel(gasChain);
-            this.setState({showGasTrackerModal: true,gasLimitHex: gasLimitHex, gasChain:gasChain,gasLevel: gasLevel});
+            this.setState({
+                showGasTrackerModal: true,
+                gasLimitHex: gasLimitHex,
+                gasChain: gasChain,
+                gasLevel: gasLevel
+            });
             await this.waitOperation("showGasTrackerModal");
             // await this.checkApprove()
             ret = this.state.gasPrice;
@@ -296,16 +320,26 @@ export class WidgetPage extends React.Component<Props, State> {
         return {error: err, result: ret}
     }
 
-    getGasLevel = async (chain:ChainType)=>{
-        if(chain == ChainType.ETH){
-            return await jsonRpc(config.ACCOUNT_NODE,{id:0,method:"eth_gasTracker",params:[],jsonrpc:"2.0"})
-        }else if(chain == ChainType.BSC){
-            const gasPrice = await jsonRpc(config.ACCOUNT_NODE,{id:0,method:"eth_gasPrice",params:[],jsonrpc:"2.0"},chain)
+    getGasLevel = async (chain: ChainType) => {
+        if (chain == ChainType.ETH) {
+            return await jsonRpc(config.ACCOUNT_NODE, {id: 0, method: "eth_gasTracker", params: [], jsonrpc: "2.0"})
+        } else if (chain == ChainType.BSC) {
+            const gasPrice = await jsonRpc(config.ACCOUNT_NODE, {
+                id: 0,
+                method: "eth_gasPrice",
+                params: [],
+                jsonrpc: "2.0"
+            }, chain)
             return {
                 AvgGasPrice: {gasPrice: gasPrice, second: 5}
             }
-        }else if(chain == ChainType.SERO){
-            const gasPrice = await jsonRpc(config.ACCOUNT_NODE,{id:0,method:"sero_gasPrice",params:[],jsonrpc:"2.0"},chain)
+        } else if (chain == ChainType.SERO) {
+            const gasPrice = await jsonRpc(config.ACCOUNT_NODE, {
+                id: 0,
+                method: "sero_gasPrice",
+                params: [],
+                jsonrpc: "2.0"
+            }, chain)
             return {
                 AvgGasPrice: {gasPrice: gasPrice, second: 5}
             }
@@ -336,7 +370,7 @@ export class WidgetPage extends React.Component<Props, State> {
         return Promise.resolve(true);
     }
 
-    isApproved = (accountId:string)=>{
+    isApproved = (accountId: string) => {
         const refer = getParentUrl();
         // const accountId = selfStorage.getItem("accountId")
         let host = refer.replace("http://", "").replace("https://", "");
@@ -363,15 +397,15 @@ export class WidgetPage extends React.Component<Props, State> {
         }
     }
 
-    checkBackup = async (account:AccountModel) => {
+    checkBackup = async (account: AccountModel) => {
         // const account = await walletWorker.accountInfoAsync();
         if (account && account.name) {
-            if(!account["backedUp"]){
+            if (!account["backedUp"]) {
                 // selfStorage.setItem("accountId", account.accountId);
                 // selfStorage.setItem(account.accountId, account);
                 this.setShowBackupModal(true)
                 await this.waitOperation("showBackupModal")
-                if(!url.accountOpenBackup()){
+                if (!url.accountOpenBackup()) {
                     return Promise.reject("The popup window has been blocked.")
                 }
                 await this.waitAccountBackup(account.accountId)
@@ -397,7 +431,7 @@ export class WidgetPage extends React.Component<Props, State> {
     }
 
     waitOperation = async (item: string) => {
-        this.setState({ opCode:Operation._ })
+        this.setState({opCode: Operation._})
         for (let i = 0; i < 240; i++) {
             await this.waitTime();
             const f: boolean = this.state[item];
@@ -407,19 +441,19 @@ export class WidgetPage extends React.Component<Props, State> {
         }
         const opCode = this.state.opCode;
 
-        if(opCode == Operation.confirm){
-            this.setState({ opCode:Operation._ })
+        if (opCode == Operation.confirm) {
+            this.setState({opCode: Operation._})
             return Promise.resolve(true);
         }
-        if(opCode == Operation.cancel){
-            this.setState({ opCode:Operation._ })
+        if (opCode == Operation.cancel) {
+            this.setState({opCode: Operation._})
             return Promise.reject(i18n.t("userCancel"));
         }
-        if(opCode == Operation.reject){
-            this.setState({ opCode:Operation._ })
+        if (opCode == Operation.reject) {
+            this.setState({opCode: Operation._})
             return Promise.reject(i18n.t("userReject"));
         }
-        this.setState({ opCode:Operation._ })
+        this.setState({opCode: Operation._})
         return Promise.reject(i18n.t("operationTimeout"));
     }
 
@@ -435,11 +469,13 @@ export class WidgetPage extends React.Component<Props, State> {
     checkAccountExist = async (): Promise<boolean> => {
         const accounts = await walletWorker.accounts();
         if (!accounts || accounts.length == 0) {
-            if(!url.accountOpenCreate()){
-               return Promise.reject("The popup window has been blocked.")
+            await this._hideWidget();
+            if (!url.accountOpenCreate()) {
+                return Promise.reject("The popup window has been blocked.")
             }
-            // await this._hideWidget();
+            //
             await this.waitAccountCreate();
+            await this._showWidget();
         }
         return Promise.resolve(true);
     }
@@ -447,21 +483,21 @@ export class WidgetPage extends React.Component<Props, State> {
     waitAccountCreate = async () => {
         // if( utils.isIos()){
 
-            // window.location.href = ""
+        // window.location.href = ""
         //    technology.emit.wallet
         // }else{
-            for (let i = 0; i < 600; i++) {
-                await this.waitTime(1);
-                if (this.getStorageAccountId()) {
-                    url.closeTopWindow();
-                    break;
-                }
+        for (let i = 0; i < 600; i++) {
+            await this.waitTime(1);
+            if (this.getStorageAccountId()) {
+                url.closeTopWindow();
+                break;
             }
+        }
         // }
         return Promise.resolve(true);
     }
 
-    waitAccountBackup = async (accountId:string) => {
+    waitAccountBackup = async (accountId: string) => {
         for (let i = 0; i < 600; i++) {
             await this.waitTime(1);
             const account = await walletWorker.accountInfoAsync(accountId)
@@ -494,8 +530,8 @@ export class WidgetPage extends React.Component<Props, State> {
         if (err) {
             return {error: err, result: []}
         } else {
-            const accounts:Array<string> = [];
-            for(let act of result){
+            const accounts: Array<string> = [];
+            for (let act of result) {
                 accounts.push(act.addresses[config.network.chainType])
             }
             return {error: err, result: accounts}
@@ -505,7 +541,7 @@ export class WidgetPage extends React.Component<Props, State> {
 
 
     signTransaction = async (txParams: any, config: IConfig): Promise<{ error: string, result: string }> => {
-        let chainParams, err = null, ret = null,from;
+        let chainParams, err = null, ret = null, from;
         if (utils.isWeb3Chain(config.network.chainType.valueOf())) {
             if (!txParams.nonce) {
                 return {error: "tx nonce is required! ", result: ""}
@@ -522,23 +558,23 @@ export class WidgetPage extends React.Component<Props, State> {
                 }
             }
             from = txParams.from;
-        }else if(config.network.chainType == ChainType.EMIT){
+        } else if (config.network.chainType == ChainType.EMIT) {
             from = txParams["address"];
         }
         try {
             await this._showWidget();
             await this.checkWalletStates(config)
-            const account = await walletWorker.getAccountByAddressAndChainId(from,config.network.chainType.valueOf());
+            const account = await walletWorker.getAccountByAddressAndChainId(from, config.network.chainType.valueOf());
             await this.checkApprove(account.accountId)
             await this.checkBackup(account);
-            this.setState({tx: txParams, showTransactionModal: true,account:account})
+            this.setState({tx: txParams, showTransactionModal: true, account: account})
             await this.waitOperation("showTransactionModal");
             // const {account} = this.state;
 
 
             ret = await walletWorker.signTx(account.accountId, "", config.network.chainType, txParams, chainParams)
-            if(utils.isWeb3Chain(config.network.chainType.valueOf())){
-                ret = "0x"+web3Utils.stripHexPrefix(ret)
+            if (utils.isWeb3Chain(config.network.chainType.valueOf())) {
+                ret = "0x" + web3Utils.stripHexPrefix(ret)
             }
         } catch (e) {
             err = typeof e == 'string' ? e : e.message;
@@ -556,8 +592,8 @@ export class WidgetPage extends React.Component<Props, State> {
             }
             await this._showWidget();
             await this.checkWalletStates(config);
-            const account = await walletWorker.getAccountByAddressAndChainId(msgParams.from,config.network.chainType.valueOf());
-            this.setState({showSignMessageModal: true,account:account})
+            const account = await walletWorker.getAccountByAddressAndChainId(msgParams.from, config.network.chainType.valueOf());
+            this.setState({showSignMessageModal: true, account: account})
             await this.waitOperation("showSignMessageModal");
             const standard = msgParams["messageStandard"];
             // const {account} = this.state;
@@ -623,9 +659,9 @@ export class WidgetPage extends React.Component<Props, State> {
     }
 
     setLanguage = (code: string): Promise<void> => {
-        selfStorage.setItem("language",code);
-        i18n.changeLanguage(code).then(()=>{
-        }).catch((e:any)=>{
+        selfStorage.setItem("language", code);
+        i18n.changeLanguage(code).then(() => {
+        }).catch((e: any) => {
             console.error(e)
         })
         return
@@ -664,15 +700,15 @@ export class WidgetPage extends React.Component<Props, State> {
         await walletWorker.unlockWallet(password)
     }
 
-    setShowBackupModal = (f:boolean) =>{
-        this.setState({showBackupModal:f})
+    setShowBackupModal = (f: boolean) => {
+        this.setState({showBackupModal: f})
     }
 
     render() {
         const {
-            account,showTransactionModal, showToast, toastMessage, config, msg, showAccountsModal
-            , showUnlockModal, tx, showApproveModal, showSignMessageModal, accounts,showBackupModal,
-            gasChain,showGasTrackerModal,gasLimitHex,gasLevel,dappAccountId
+            account, showTransactionModal, showToast, toastMessage, config, msg, showAccountsModal
+            , showUnlockModal, tx, showApproveModal, showSignMessageModal, accounts, showBackupModal,
+            gasChain, showGasTrackerModal, gasLimitHex, gasLevel, dappAccountId
         } = this.state;
         return (
             <div>
@@ -680,15 +716,15 @@ export class WidgetPage extends React.Component<Props, State> {
                     tx && config && account && utils.isWeb3Chain(config.network.chainType) &&
                     <SignTxWidgetWeb3 showModal={showTransactionModal}
                                       onCancel={() => {
-                                      // this._hideWidget()
-                                      this.setState({showTransactionModal: false, opCode : Operation.cancel})
-                                  }}
+                                          // this._hideWidget()
+                                          this.setState({showTransactionModal: false, opCode: Operation.cancel})
+                                      }}
                                       onOk={() => {
-                                      this.setState({showTransactionModal: false, opCode : Operation.confirm})
-                                  }}
+                                          this.setState({showTransactionModal: false, opCode: Operation.confirm})
+                                      }}
                                       onReject={() => {
-                                      this.setState({showTransactionModal: false, opCode : Operation.reject})
-                                  }}
+                                          this.setState({showTransactionModal: false, opCode: Operation.reject})
+                                      }}
                                       router={this.props.router}
                                       transaction={tx}
                                       config={config}
@@ -698,49 +734,49 @@ export class WidgetPage extends React.Component<Props, State> {
 
                 {
                     tx && config && account && config.network.chainType == ChainType.EMIT &&
-                <SignTxWidgetEmit showModal={showTransactionModal}
-                                  onCancel={() => {
-                                      // this._hideWidget()
-                                      this.setState({showTransactionModal: false, opCode : Operation.cancel})
-                                  }}
-                                  onOk={() => {
-                                      this.setState({showTransactionModal: false, opCode : Operation.confirm})
-                                  }}
-                                  onReject={() => {
-                                      this.setState({showTransactionModal: false, opCode : Operation.reject})
-                                  }}
-                                  router={this.props.router}
-                                  transaction={tx}
-                                  config={config}
-                                  account={account}
-                />
+                    <SignTxWidgetEmit showModal={showTransactionModal}
+                                      onCancel={() => {
+                                          // this._hideWidget()
+                                          this.setState({showTransactionModal: false, opCode: Operation.cancel})
+                                      }}
+                                      onOk={() => {
+                                          this.setState({showTransactionModal: false, opCode: Operation.confirm})
+                                      }}
+                                      onReject={() => {
+                                          this.setState({showTransactionModal: false, opCode: Operation.reject})
+                                      }}
+                                      router={this.props.router}
+                                      transaction={tx}
+                                      config={config}
+                                      account={account}
+                    />
                 }
 
-                    <SignMessageWidget showModal={showSignMessageModal}
-                                       onCancel={() => {
-                                           // this._hideWidget()
-                                           this.setState({showSignMessageModal: false, opCode : Operation.cancel})
-                                       }}
-                                       onOk={() => {
-                                           this.setState({showSignMessageModal: false, opCode : Operation.confirm})
-                                       }}
-                                       onReject={() => {
-                                           this.setState({showSignMessageModal: false, opCode : Operation.reject})
-                                       }}
-                                       router={this.props.router} msg={msg} account={account} config={config}/>
+                <SignMessageWidget showModal={showSignMessageModal}
+                                   onCancel={() => {
+                                       // this._hideWidget()
+                                       this.setState({showSignMessageModal: false, opCode: Operation.cancel})
+                                   }}
+                                   onOk={() => {
+                                       this.setState({showSignMessageModal: false, opCode: Operation.confirm})
+                                   }}
+                                   onReject={() => {
+                                       this.setState({showSignMessageModal: false, opCode: Operation.reject})
+                                   }}
+                                   router={this.props.router} msg={msg} account={account} config={config}/>
 
 
                 {
                     <ApproveWidget showModal={showApproveModal}
                                    onCancel={() => {
                                        // this._hideWidget()
-                                       this.setState({showApproveModal: false, opCode : Operation.cancel})
+                                       this.setState({showApproveModal: false, opCode: Operation.cancel})
                                    }}
                                    onOk={() => {
-                                       this.setState({showApproveModal: false, opCode : Operation.confirm})
+                                       this.setState({showApproveModal: false, opCode: Operation.confirm})
                                    }}
                                    onReject={() => {
-                                       this.setState({showApproveModal: false, opCode : Operation.reject})
+                                       this.setState({showApproveModal: false, opCode: Operation.reject})
                                    }}
                                    router={this.props.router} config={config} account={account}
                     />
@@ -754,7 +790,7 @@ export class WidgetPage extends React.Component<Props, State> {
                                      this.setState({showUnlockModal: false})
                                  }}
                                  onOk={(password) => {
-                                     this.unlockWallet(password).then(()=>{
+                                     this.unlockWallet(password).then(() => {
                                          this.setState({showUnlockModal: false})
                                      }).catch(e => {
                                          const err = typeof e == 'string' ? e : e.message;
@@ -773,19 +809,19 @@ export class WidgetPage extends React.Component<Props, State> {
                     <AccountListModal showModal={showAccountsModal}
                                       onCancel={() => {
                                           // this._hideWidget()
-                                          this.setState({showAccountsModal: false, opCode : Operation.cancel})
+                                          this.setState({showAccountsModal: false, opCode: Operation.cancel})
                                       }}
                                       onOk={(account) => {
                                           // selfStorage.setItem("accountId", account.accountId);
                                           this.setState({
                                               showAccountsModal: false,
-                                              account: account ,
-                                              opCode : Operation.confirm
+                                              account: account,
+                                              opCode: Operation.confirm
                                           })
                                       }}
 
                                       onReject={() => {
-                                          this.setState({showAccountsModal: false, opCode : Operation.reject})
+                                          this.setState({showAccountsModal: false, opCode: Operation.reject})
                                       }}
                                       accounts={accounts}
                                       selectedAccountId={dappAccountId}
@@ -795,18 +831,18 @@ export class WidgetPage extends React.Component<Props, State> {
 
                 {
                     <BackupModal showModal={showBackupModal}
-                                      onCancel={() => {
-                                          // this._hideWidget()
-                                          this.setState({showBackupModal: false,opCode: Operation.cancel})
-                                      }}
-                                      onOk={() => {
-                                          this.setState({ showBackupModal: false, opCode: Operation.confirm })
-                                      }}
-                                      onReject={() => {
-                                          this.setState({showBackupModal: false,opCode: Operation.reject})
-                                      }}
-                                      selected={account}
-                                      router={this.props.router}
+                                 onCancel={() => {
+                                     // this._hideWidget()
+                                     this.setState({showBackupModal: false, opCode: Operation.cancel})
+                                 }}
+                                 onOk={() => {
+                                     this.setState({showBackupModal: false, opCode: Operation.confirm})
+                                 }}
+                                 onReject={() => {
+                                     this.setState({showBackupModal: false, opCode: Operation.reject})
+                                 }}
+                                 selected={account}
+                                 router={this.props.router}
                     />
                 }
 
@@ -821,18 +857,18 @@ export class WidgetPage extends React.Component<Props, State> {
                 />
 
                 {
-                    gasLevel && <GasPriceActionSheet gasLimit={gasLimitHex} gasLevel={gasLevel} onClose={()=>{
+                    gasLevel && <GasPriceActionSheet gasLimit={gasLimitHex} gasLevel={gasLevel} onClose={() => {
                         this.setState({
-                            showGasTrackerModal:false,
+                            showGasTrackerModal: false,
                             opCode: Operation.cancel
                         })
-                    }} onSelect={(gasPrice)=>{
+                    }} onSelect={(gasPrice) => {
                         this.setState({
-                            showGasTrackerModal:false,
+                            showGasTrackerModal: false,
                             opCode: Operation.confirm,
                             gasPrice: gasPrice
                         })
-                    }} isOpen={showGasTrackerModal} chain={gasChain} />
+                    }} isOpen={showGasTrackerModal} chain={gasChain}/>
                 }
             </div>
         );
